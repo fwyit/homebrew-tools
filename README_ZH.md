@@ -22,13 +22,13 @@ brew时以github为基础构建的ruby脚本，所有仓库都集中再github上
 ---
 ## 命令
 
-1.  brew tap
+###  brew tap
 
 ##### brew tap &lt;user/repo&gt;
 
 将你自己的仓库clone到本地Tap文件夹下，你可以通过brew \[un\]install来管理你的仓库中的软件的安装与卸载。当你使用brew update时，也会更新自己仓库中的包安装文件。
 
-例如上面的我的仓库`homebrew-tools`，我的用户名是`favaorinfo`，则我可以使用 brew tap favorinfo/tools，来增加自己的仓库。
+例如上面的我的仓库`homebrew-tools`，我的用户名是`favorinfo`，则我可以使用 `brew tap favorinfo/tools`来增加自己的仓库。
 
 ##### brew tap &lt;user/repo&gt;
 
@@ -51,9 +51,9 @@ brew时以github为基础构建的ruby脚本，所有仓库都集中再github上
 假如自己的仓库中有和homebrew-core仓库中名字相同的包，当然可以。 当使用`brew_install`命令时brew会有一个默认的搜索顺序：
 
 ```
--   pinned taps(标记的仓库)
--   core formulae(核心仓库)
--   other taps(其他仓库)
+    -   pinned taps(标记的仓库)
+    -   core formulae(核心仓库)
+    -   other taps(其他仓库)
 ```
 
 也就是说假如我们给任何仓库一个pinned标记，homebrew会自动先搜索核心仓库，再搜索其他仓库。假如标记了某个仓库，则会先搜索标记的仓库，在搜索核心仓库，最后是其他仓库。 假如我们标记了某个仓库，例如`saka`,那当我的仓库中有curl包，core中也有curl包时，首先安装`saka`仓库中的curl。
@@ -63,12 +63,12 @@ brew时以github为基础构建的ruby脚本，所有仓库都集中再github上
     brew install vim                     # 从homebrew/core安装
     brew install username/repo/vim       # 从指定仓库安装
 
-发布自己的包
-------------
+---
+## 发布自己的包
 
 brew是以ruby脚本来执行安装，语法遵循ruby语法。
 
-1.  发布源码包地址
+* 发布源码包地址
 
 假设现在有一个c语言编写的获取天气命令行客户端，放在github托管，文件地址为
 
@@ -86,7 +86,7 @@ brew是以ruby脚本来执行安装，语法遵循ruby语法。
     set(VERSION_PATCH 0)
 ```
 
-1.  创建formula 执行命令行
+* 创建formula 执行命令行
 
 ```
     brew create https://raw.githubusercontent.com/rangaofei/SimpleWeather/master/sweather-1.0.7.tar.gz
@@ -157,8 +157,8 @@ brew会自动创建一个sweather.rb 文件，文件内容大致如下(此处我
 
 
 > ### 备注：
-> 原谅我可耻的参考[rangaofei](https://github.com/rangaofei/)童鞋[saka](https://github.com/rangaofei/homebrew-saka)库内容做了部分改编。
-> 这个库主要用于下载一些自己常用但是官方不提供的下载地址的软件。
+> 原谅我可耻的参考[rangaofei](https://github.com/rangaofei/)童鞋[saka](https://github.com/rangaofei/homebrew-saka)库内容做了部分改编。  
+> 这个库主要用于下载一些自己常用但是官方不提供的下载地址的软件。  
 > 如果有其他需要更新的项目，欢迎随时提交issue....
 
 
