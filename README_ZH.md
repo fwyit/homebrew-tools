@@ -92,7 +92,7 @@ brew是以ruby脚本来执行安装，语法遵循ruby语法。
     brew create https://raw.githubusercontent.com/rangaofei/SimpleWeather/master/sweather-1.0.7.tar.gz
 ```
 
-brew会自动创建一个sweather.rb 文件，文件内容大致如下(此处我已修改了一些内容，包括desc，homepage，cmake依赖以及安装时改用cmake)：
+brew会自动创建一个sweather.rb 文件，文件内容大致如下(此处我已修改了一些内容, 包括:desc，homepage，cmake依赖以及安装时改用cmake )：
 
 ```
     # Documentation: https://docs.brew.sh/Formula-Cookbook.html
@@ -100,13 +100,14 @@ brew会自动创建一个sweather.rb 文件，文件内容大致如下(此处我
     # PLEASE REMOVE ALL GENERATED COMMENTS BEFORE SUBMITTING YOUR PULL REQUEST!
 
     class Sweather < Formula
-      desc "一个非常简单的获取天气客户端\n    ----by saka"
+      desc "一个非常简单的获取天气客户端\n --by 换行显示"
       homepage "https://juejin.im/user/5855ebea8d6d810065a4befa/posts"
       url "https://raw.githubusercontent.com/rangaofei/SimpleWeather/master/sweather-1.0.7.tar.gz"
       sha256 "64808c700bd46d837c6b06d7965f4f99d3c91b4c2764c3d02f893b8dfb9e9aa2"
 
       depends_on "cmake" => :build
-    #  depends_on "curl"=>:run
+      # depends_on "curl"=>:run
+
       def install
         etc.install Dir["src/*"]
         mkdir "build" do
@@ -118,15 +119,10 @@ brew会自动创建一个sweather.rb 文件，文件内容大致如下(此处我
       end
 
       test do
-        # `test do` will create, run in and delete a temporary directory.
+        # `test do`会被创建在一个临时目录进行创建、运行以及删除
         #
-        # This test will fail and we won't accept that! For Homebrew/homebrew-core
-        # this will need to be a test that verifies the functionality of the
-        # software. Run the test with `brew test sweather`. Options passed
-        # to `brew install` such as `--HEAD` also need to be provided to `brew test`.
-        #
-        # The installed folder is not in the path, so use the entire path to any
-        # executables being tested: `system "#{bin}/program", "do", "something"`.
+        # 在Homebrew/homebrew-core中，此部分使用`brew test xxxx`用来进行功能验证。
+        # 安装目录并不在路径中，所以需要使用全路径进行测试: `system "#{bin}/program", "do", "something"`.
         system "false"
       end
     end
@@ -150,11 +146,12 @@ brew会自动创建一个sweather.rb 文件，文件内容大致如下(此处我
 
 由于安装时依赖了cmake，所以会自动先下载安装cmake（我已安装好），然后下载sweather安装。 此时你就可以在命令行查看天气了：
 
+```
     sweather -v # 查看当前版本
     sweather -setloc liangxi #设置天气地址为梁溪-无锡
     sweather -now #查看现在天气
     sweather #查看三天的天气
-
+```
 
 > ### 备注：
 > 原谅我可耻的参考[rangaofei](https://github.com/rangaofei/)童鞋[saka](https://github.com/rangaofei/homebrew-saka)库内容做了部分改编。  
