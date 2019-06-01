@@ -11,12 +11,11 @@ class RancherRio < Formula
   bottle :unneeded
 
   def install
-    system "pwd | cat"
-    system "install rio-darwin-amd64 /usr/local/bin/rio"
+    system "mv rio-darwin-amd64 rio"
+    bin.install "rio"
   end
 
   test do
-    system "false"
     system "rio -v"
   end
 end
