@@ -1,7 +1,7 @@
 # Documentation: https://docs.brew.sh/Formula-Cookbook
 #                http://www.rubydoc.info/github/Homebrew/brew/master/Formula
 # PLEASE REMOVE ALL GENERATED COMMENTS BEFORE SUBMITTING YOUR PULL REQUEST!
-class SshPass < Formula
+class Sshpass < Formula
   desc "Non-interactive ssh password auth"
   homepage "https://sourceforge.net/projects/sshpass"
   url "https://sourceforge.net/projects/sshpass/files/sshpass/1.05/sshpass-1.05.tar.gz"
@@ -29,6 +29,6 @@ class SshPass < Formula
     #
     # The installed folder is not in the path, so use the entire path to any
     # executables being tested: `system "#{bin}/program", "do", "something"`.
-    system "sshpass"
+    system "false"
   end
 end
