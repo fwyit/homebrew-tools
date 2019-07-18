@@ -5,7 +5,9 @@ brew会提供一个官方的仓库，`homebrew-core`[github地址](https://githu
 
 homebrew安装完毕后这个仓库自动加载到`/usr/local/Homerew/Library/Taps/`文件夹下，这是一个git管理的地址，意味着我们可以提交自己的pullrequest到该仓库。
 
-重点关注一下`homebrew-core/Formula/`,该文件夹下包含我们所有的仓库中的软件安装脚本，例如`curl.rb`这个ruby脚本即是安装curl时需要的脚本。
+重点关注一下项目下目录：
+* `Formula` 命令行软件安装脚本，例如`curl.rb`是安装curl时需要的脚本。
+* `Casks`   二进制类运行软件脚本，如`1password.rb`这个表示直接安装1password软件。
 
 ---
 ## 加入第三方仓库
@@ -16,21 +18,21 @@ homebrew安装完毕后这个仓库自动加载到`/usr/local/Homerew/Library/Ta
 
 brew时以github为基础构建的ruby脚本，所有仓库都集中再github上，所有此处演示的也是构建再github上的仓库。
 
-1.  仓库名称必须以`homebrew-anything`格式来命名，`homebrew-` 前缀是可选的，但是如果不加该前缀，必须使用整个url来安装，相当麻烦，所以务必加上此前缀。`anything`可以设置为任意自己喜欢的名字。 
-2.  创建一个Formula文件夹，用来存放安装脚本，里边的文件名称就是你在brew install 时候的
+1.  仓库名称必须以`homebrew-anything`格式来命名，`homebrew-` 前缀是可选的，但是如果不加该前缀，必须使用整个url来安装，相当麻烦，所以务必加上此前缀。`anything`可以设置为任意自己喜欢的名字，如本项目的anything为`tools`。 
+2.  创建一个Formula文件夹，用来存放安装脚本，里边的文件名称就是你在brew install 时候需要下载的软件包名。
 
 ---
 ## 命令
 
 ###  brew tap
 
-##### brew tap &lt;user/repo&gt;
+##### brew tap <user/repo>
 
 将你自己的仓库clone到本地Tap文件夹下，你可以通过brew \[un\]install来管理你的仓库中的软件的安装与卸载。当你使用brew update时，也会更新自己仓库中的包安装文件。
 
-例如上面的我的仓库`homebrew-tools`，我的用户名是`favorinfo`，则我可以使用 `brew tap favorinfo/tools`来增加自己的仓库。
+例如上面的我的仓库`homebrew-tools`，我的用户名是`fwyit`，则我可以使用 `brew tap fwyit/tools`来增加自己的仓库。
 
-##### brew tap &lt;user/repo&gt;
+##### brew tap <user/repo>
 
 通过url将其他非github的仓库添加进来，这个地址可以不是http协议，只要支持git协议即可。此处不演示。
 
@@ -128,7 +130,7 @@ brew会自动创建一个sweather.rb 文件，文件内容大致如下(此处我
     end
 ```
 
-这个文件会创建在核心仓库，也就是在`/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/`位置，只要copy我们自己仓库的位置即可,我的是`/usr/local/Homebrew/Library/Taps/favorinfo/homebrew-tools/Formula/`。更改完毕后，通过git提交至自己的github即可。
+这个文件会创建在核心仓库，也就是在`/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/`位置，只要copy我们自己仓库的位置即可,我的是`/usr/local/Homebrew/Library/Taps/fwyit/homebrew-tools/Formula/`。更改完毕后，通过git提交至自己的github即可。
 
 ```
     git add sweather.rb
@@ -154,7 +156,7 @@ brew会自动创建一个sweather.rb 文件，文件内容大致如下(此处我
 ```
 
 > ### 备注：
-> 原谅我可耻的参考[rangaofei](https://github.com/rangaofei/)童鞋[saka](https://github.com/rangaofei/homebrew-saka)库内容做了部分改编。  
+> 原谅可耻的参考[rangaofei](https://github.com/rangaofei/)童鞋[saka](https://github.com/rangaofei/homebrew-saka)库内容做了部分改编。  
 > 这个库主要用于下载一些自己常用但是官方不提供的下载地址的软件。  
 > 如果有其他需要更新的项目，欢迎随时提交issue....
 
