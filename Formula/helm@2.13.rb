@@ -1,4 +1,4 @@
-class Helm < Formula
+class HelmAT213 < Formula
   desc "The Kubernetes package manager"
   homepage "https://helm.sh/"
   version "v2.13.1"
