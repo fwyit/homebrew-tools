@@ -3,19 +3,19 @@ class DockerCompose < Formula
 
   desc "Isolated development environments using Docker"
   homepage "https://docs.docker.com/compose/"
-  url "https://github.com/docker/compose/archive/1.24.0.tar.gz"
-  sha256 "31933e401d295812617f23377f63fc2b8da13d8456b61a60cec0e02afcad5672"
+  url "https://github.com/docker/compose/archive/1.25.3.tar.gz"
+  sha256 "c294f71baab825b787b8c66a1e03c4631ed6813fee4e3b3b8a48fc65c7314ecb"
   head "https://github.com/docker/compose.git"
 
   bottle do
     cellar :any
-    sha256 "fd830417c27771b56440a1a605762df3a97b22daa59c9fd043900ffb56f16353" => :mojave
-    sha256 "89d570a0063a45b8ded6f9bd9025bedbda187b46f771c45c8e5cc7bb8df949d7" => :high_sierra
-    sha256 "bbd9295a6d411f6733b26aab5c88257d3216beb796d902e49b49369821c341cc" => :sierra
+    sha256 "1f34a9257cff68dd4764b303e32b424ab073b56aa989f77d50aa58718e566ad9" => :catalina
+    sha256 "d336872d071071db819007dc54a9557915e610a79d76fc55f55bb80467841147" => :mojave
+    sha256 "20814632cf2478e2560b86f27a119c6ca5f96d89537ef30e5820b56f85ea1fdd" => :high_sierra
   end
 
   depends_on "libyaml"
-  depends_on "python"
+  depends_on "python@3.8"
 
   def install
     system "./script/build/write-git-sha" if build.head?

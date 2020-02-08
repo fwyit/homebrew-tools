@@ -3,9 +3,9 @@ class Go < Formula
   homepage "https://golang.org"
 
   stable do
-    url "https://dl.google.com/go/go1.12.5.src.tar.gz"
-    mirror "https://fossies.org/linux/misc/go1.12.5.src.tar.gz"
-    sha256 "2aa5f088cbb332e73fc3def546800616b38d3bfe6b8713b8a6404060f22503e8"
+    url "https://dl.google.com/go/go1.13.7.src.tar.gz"
+    mirror "https://fossies.org/linux/misc/go1.13.7.src.tar.gz"
+    sha256 "e4ad42cc5f5c19521fbbbde3680995f2546110b5c6aa2b48c3754ff7af9b41f4"
 
     go_version = version.to_s.split(".")[0..1].join(".")
     resource "gotools" do
@@ -15,9 +15,9 @@ class Go < Formula
   end
 
   bottle do
-    sha256 "7248d0975a00e71212adce983a64c58b02eea391a9bc10057ecec382350c815f" => :mojave
-    sha256 "5b6c666880c38bf793e9cf7ca3161d2ce2feb36cfc1594aee1b4e0222e0aefd6" => :high_sierra
-    sha256 "8775608c37110cf58187ebb0d83258cae2a717045243d58107f0b86210dca315" => :sierra
+    sha256 "5ba18a71fa1ac99a0bc107389532b798d7fcaa61d88c6658a0c2fb0b53c37065" => :catalina
+    sha256 "9cba4cf601c8ff2dde3152909e0394d827fb2dc16bf488f1a6a0701bf0366707" => :mojave
+    sha256 "4f22d45ef315671c6d5fcdf853d3847997d92f13846ae1c289b469d4b50d8c13" => :high_sierra
   end
 
   head do
@@ -28,12 +28,11 @@ class Go < Formula
     end
   end
 
-  depends_on :macos => :yosemite
+  depends_on :macos => :el_capitan
 
   # Don't update this unless this version cannot bootstrap the new version.
   resource "gobootstrap" do
     url "https://storage.googleapis.com/golang/go1.7.darwin-amd64.tar.gz"
-    version "1.7"
     sha256 "51d905e0b43b3d0ed41aaf23e19001ab4bc3f96c3ca134b48f7892485fc52961"
   end
 
@@ -56,7 +55,6 @@ class Go < Formula
 
     # Build and install godoc
     ENV.prepend_path "PATH", bin
-    ENV["GO111MODULE"] = "on"
     ENV["GOPATH"] = buildpath
     (buildpath/"src/golang.org/x/tools").install resource("gotools")
     cd "src/golang.org/x/tools/cmd/godoc/" do
@@ -86,6 +84,7 @@ class Go < Formula
     assert_predicate libexec/"bin/godoc", :executable?
 
     ENV["GOOS"] = "freebsd"
+    ENV["GOARCH"] = "amd64"
     system bin/"go", "build", "hello.go"
   end
 end

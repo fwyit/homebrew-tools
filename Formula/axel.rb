@@ -1,14 +1,15 @@
 class Axel < Formula
   desc "Light UNIX download accelerator"
   homepage "https://github.com/eribertomota/axel"
-  url "https://github.com/axel-download-accelerator/axel/archive/v2.17.3.tar.gz"
-  sha256 "13cc30194a2d52cdb87b0deca6e472ac75fbb2d8af72d554ba3936f1e2a416a7"
+  url "https://github.com/axel-download-accelerator/axel/releases/download/v2.17.7/axel-2.17.7.tar.gz"
+  sha256 "b05e828fac19acb3bddb7d5e5af69617f29f34aea78dd2045cf30edc834cb4d5"
   head "https://github.com/eribertomota/axel.git"
 
   bottle do
-    sha256 "ee8290a5bebdc8dd004a01dc7ab79ddce852bc4ac116d2628eccd0233c6145a1" => :mojave
-    sha256 "5653614b55d9ed7e0340ddf16bfea60934af1146d403eed4f7d54a3a7ab58501" => :high_sierra
-    sha256 "7210f4ac81aa0689a2471ca5989bd03525bac13133ba25ebed7b234883cefd42" => :sierra
+    cellar :any
+    sha256 "f21813f4113f1c50d6c9c241210435f5db49e63136ada0beb4e6b13b71922b7e" => :catalina
+    sha256 "ea45d5812240f3969a9ae75adedd25a37a133e38002d33a655ca1c46118f5153" => :mojave
+    sha256 "8cdedff82eae38b9e34842d3546b48b5ad4729fa949bcbcdc6e194afa78fbcfe" => :high_sierra
   end
 
   depends_on "autoconf" => :build
@@ -16,7 +17,7 @@ class Axel < Formula
   depends_on "automake" => :build
   depends_on "pkg-config" => :build
   depends_on "gettext"
-  depends_on "openssl"
+  depends_on "openssl@1.1"
 
   def install
     # Fixes the macOS build by esuring some _POSIX_C_SOURCE
@@ -24,7 +25,6 @@ class Axel < Formula
     # https://github.com/axel-download-accelerator/axel/pull/196
     ENV.append_to_cflags "-D_DARWIN_C_SOURCE"
 
-    system "./autogen.sh"
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
                           "--sysconfdir=#{etc}"

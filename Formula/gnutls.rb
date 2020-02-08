@@ -1,18 +1,21 @@
 class Gnutls < Formula
   desc "GNU Transport Layer Security (TLS) Library"
   homepage "https://gnutls.org/"
-  url "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.8.tar.xz"
-  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/gnutls/v3.6/gnutls-3.6.8.tar.xz"
-  sha256 "aa81944e5635de981171772857e72be231a7e0f559ae0292d2737de475383e83"
+  url "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.12.tar.xz"
+  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/gnutls/v3.6/gnutls-3.6.12.tar.xz"
+  sha256 "bfacf16e342949ffd977a9232556092c47164bd26e166736cf3459a870506c4b"
 
   bottle do
-    sha256 "6679cf795332813d1e41778272f3e8283dc13435c637a1f3b94c98956b490c93" => :mojave
-    sha256 "547c72cff04d3d125d92a0f1a9b96855fa77608471f86c04eaf84b8c11759c2d" => :high_sierra
-    sha256 "895d26abcb5e3d8ba7d48c7d4ccef936a7f1c570802f26f90303bbeed1c16bfc" => :sierra
+    sha256 "3368ca58ab6284e849a47ac03c5634b799d550f6348b9dd0794d68bc747c6ca6" => :catalina
+    sha256 "f05a5a764d462c533d5f0777d3bedb3c26847255ce246c6b4eb8b6b2dfd18e15" => :mojave
+    sha256 "323964700f54c32854c860baef7f310a8a8c6b886912c22cff6503cc42f5e224" => :high_sierra
   end
 
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
   depends_on "pkg-config" => :build
   depends_on "gmp"
+  depends_on "libidn2"
   depends_on "libtasn1"
   depends_on "libunistring"
   depends_on "nettle"
@@ -31,6 +34,9 @@ class Gnutls < Formula
       --disable-heartbeat-support
       --with-p11-kit
     ]
+
+    # Work around a gnulib issue with macOS Catalina
+    args << "gl_cv_func_ftello_works=yes"
 
     system "./configure", *args
     system "make", "install"

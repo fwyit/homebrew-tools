@@ -1,13 +1,13 @@
 class Nghttp2 < Formula
   desc "HTTP/2 C Library"
   homepage "https://nghttp2.org/"
-  url "https://github.com/nghttp2/nghttp2/releases/download/v1.38.0/nghttp2-1.38.0.tar.xz"
-  sha256 "ef75c761858241c6b4372fa6397aa0481a984b84b7b07c4ec7dc2d7b9eee87f8"
+  url "https://github.com/nghttp2/nghttp2/releases/download/v1.40.0/nghttp2-1.40.0.tar.xz"
+  sha256 "09fc43d428ff237138733c737b29fb1a7e49d49de06d2edbed3bc4cdcee69073"
 
   bottle do
-    sha256 "aebb18502b1abd48b42022d09c37eff0486bdecd250e15e2cc98ca265f06e03a" => :mojave
-    sha256 "20703302a2bd99bc0580c5b76fcaec062e65a6f40d356ff9f1e2d2134d92f117" => :high_sierra
-    sha256 "b373c7c7f0df4e544a19fb623169bc3387515eb5aa53ca4a059624c20a5dec54" => :sierra
+    sha256 "7d8e5ffd4a51ee4c511f19b37d0285880d27239e0880113b6ad1412432aa9d11" => :catalina
+    sha256 "82a8630c924aecc9e22712b700cede3129cdd77765e1dfc95977a5779d6a4dd1" => :mojave
+    sha256 "77185d4ed48a5a8d00f486a0e7d09797db76ac0e280ae2aed0772dad271d4990" => :high_sierra
   end
 
   head do
@@ -26,7 +26,7 @@ class Nghttp2 < Formula
   depends_on "jemalloc"
   depends_on "libev"
   depends_on "libevent"
-  depends_on "openssl"
+  depends_on "openssl@1.1"
 
   def install
     ENV.cxx11

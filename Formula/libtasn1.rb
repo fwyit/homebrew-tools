@@ -1,16 +1,15 @@
 class Libtasn1 < Formula
   desc "ASN.1 structure parser library"
   homepage "https://www.gnu.org/software/libtasn1/"
-  url "https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.13.tar.gz"
-  mirror "https://ftpmirror.gnu.org/libtasn1/libtasn1-4.13.tar.gz"
-  sha256 "7e528e8c317ddd156230c4e31d082cd13e7ddeb7a54824be82632209550c8cca"
+  url "https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.16.0.tar.gz"
+  mirror "https://ftpmirror.gnu.org/libtasn1/libtasn1-4.16.0.tar.gz"
+  sha256 "0e0fb0903839117cb6e3b56e68222771bebf22ad7fc2295a0ed7d576e8d4329d"
 
   bottle do
     cellar :any
-    sha256 "3e18c28faee5c976dd1121790dcb69ed53c98f99ef723903fbcadcf5cf85f577" => :mojave
-    sha256 "5908b018a38a3f60195eae854d5ab61f93fde8e9179d5ab8cab720b8c41182ba" => :high_sierra
-    sha256 "4dcc5ff1b54a1d0426acc4b3f32d7c929d0f07f52f6f699d0f5f50839e047b5d" => :sierra
-    sha256 "acd0abd3cb4ec5fb7be28c28963c256e57f18ada4b1ad58c68e2a463cdf449ea" => :el_capitan
+    sha256 "00bd968b6a110c5cb497cf0e3b14800ed5e67a2476d0d544aeb1c0c2c1f3f332" => :catalina
+    sha256 "3c2e9cdfec0ccec899847a3ab69b88967b6cbc0b3e406fa1938a4ca6f277b674" => :mojave
+    sha256 "c3cf713b5bb29fcac1381b7242e557b7920cb327c77170a6dd038a477d6021cd" => :high_sierra
   end
 
   def install

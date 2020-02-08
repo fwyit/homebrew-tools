@@ -1,14 +1,15 @@
 class Python < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
-  url "https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tar.xz"
-  sha256 "da60b54064d4cfcd9c26576f6df2690e62085123826cff2e667e72a91952d318"
+  url "https://www.python.org/ftp/python/3.7.6/Python-3.7.6.tar.xz"
+  sha256 "55a2cce72049f0794e9a11a84862e9039af9183603b78bc60d89539f82cf533f"
+  revision 1
   head "https://github.com/python/cpython.git"
 
   bottle do
-    sha256 "25e0099852136c4ef1efd221247d0f67aa71f7b624211b98898f8b46c612f40d" => :mojave
-    sha256 "b65fecb4bb8350359488d6ca4c0a5a343f658f424d101a45e28d5a72de7f455c" => :high_sierra
-    sha256 "b07ec3a40f58fa317e1bb937992dc0dca7d60812c60de99bde14fbadb6c27cc5" => :sierra
+    sha256 "3871ef8b53270576c46489ae397f245b84772c405085238790cf5faa1853b33a" => :catalina
+    sha256 "643d627c2b4fc03a3286c397d299284ef8ce2d4a832737e41175f297d4f0862e" => :mojave
+    sha256 "3504f29ae0366d08fc025cfe2885cd2e685f74ab041a341a393d3b6967f139d7" => :high_sierra
   end
 
   # setuptools remembers the build flags python is built with and uses them to
@@ -24,7 +25,7 @@ class Python < Formula
 
   depends_on "pkg-config" => :build
   depends_on "gdbm"
-  depends_on "openssl"
+  depends_on "openssl@1.1"
   depends_on "readline"
   depends_on "sqlite"
   depends_on "xz"
@@ -33,18 +34,18 @@ class Python < Formula
   skip_clean "bin/easy_install3", "bin/easy_install-3.4", "bin/easy_install-3.5", "bin/easy_install-3.6", "bin/easy_install-3.7"
 
   resource "setuptools" do
-    url "https://files.pythonhosted.org/packages/c2/f7/c7b501b783e5a74cf1768bc174ee4fb0a8a6ee5af6afa92274ff964703e0/setuptools-40.8.0.zip"
-    sha256 "6e4eec90337e849ade7103723b9a99631c1f0d19990d6e8412dc42f5ae8b304d"
+    url "https://files.pythonhosted.org/packages/f7/b6/5b98441b6749ea1db1e41e5e6e7a93cbdd7ffd45e11fe1b22d45884bc777/setuptools-42.0.2.zip"
+    sha256 "c5b372090d7c8709ce79a6a66872a91e518f7d65af97fca78135e1cb10d4b940"
   end
 
   resource "pip" do
-    url "https://files.pythonhosted.org/packages/36/fa/51ca4d57392e2f69397cd6e5af23da2a8d37884a605f9e3f2d3bfdc48397/pip-19.0.3.tar.gz"
-    sha256 "6e6f197a1abfb45118dbb878b5c859a0edbdd33fd250100bc015b67fded4b9f2"
+    url "https://files.pythonhosted.org/packages/ce/ea/9b445176a65ae4ba22dce1d93e4b5fe182f953df71a145f557cffaffc1bf/pip-19.3.1.tar.gz"
+    sha256 "21207d76c1031e517668898a6b46a9fb1501c7a4710ef5dfd6a40ad9e6757ea7"
   end
 
   resource "wheel" do
-    url "https://files.pythonhosted.org/packages/b7/cf/1ea0f5b3ce55cacde1e84cdde6cee1ebaff51bd9a3e6c7ba4082199af6f6/wheel-0.33.1.tar.gz"
-    sha256 "66a8fd76f28977bb664b098372daef2b27f60dc4d1688cfab7b37a09448f0e9d"
+    url "https://files.pythonhosted.org/packages/59/b0/11710a598e1e148fb7cbf9220fd2a0b82c98e94efbdecb299cb25e7f0b39/wheel-0.33.6.tar.gz"
+    sha256 "10c9da68765315ed98850f8e048347c3eb06dd81822dc2ab1d4fde9dc9702646"
   end
 
   def install
@@ -65,7 +66,7 @@ class Python < Formula
       --enable-loadable-sqlite-extensions
       --without-ensurepip
       --with-dtrace
-      --with-openssl=#{Formula["openssl"].opt_prefix}
+      --with-openssl=#{Formula["openssl@1.1"].opt_prefix}
     ]
 
     args << "--without-gcc" if ENV.compiler == :clang
@@ -138,12 +139,6 @@ class Python < Formula
     inreplace Dir[lib_cellar/"**/_sysconfigdata_m_darwin_darwin.py"],
               %r{('LINKFORSHARED': .*?)'(Python.framework/Versions/3.\d+/Python)'}m,
               "\\1'#{opt_prefix}/Frameworks/\\2'"
-
-    # A fix, because python and python3 both want to install Python.framework
-    # and therefore we can't link both into HOMEBREW_PREFIX/Frameworks
-    # https://github.com/Homebrew/homebrew/issues/15943
-    ["Headers", "Python", "Resources"].each { |f| rm(prefix/"Frameworks/Python.framework/#{f}") }
-    rm prefix/"Frameworks/Python.framework/Versions/Current"
 
     # Symlink the pkgconfig files into HOMEBREW_PREFIX so they're accessible.
     (lib/"pkgconfig").install_symlink Dir["#{frameworks}/Python.framework/Versions/#{xy}/lib/pkgconfig/*"]
@@ -223,9 +218,9 @@ class Python < Formula
     end
 
     # Help distutils find brewed stuff when building extensions
-    include_dirs = [HOMEBREW_PREFIX/"include", Formula["openssl"].opt_include,
+    include_dirs = [HOMEBREW_PREFIX/"include", Formula["openssl@1.1"].opt_include,
                     Formula["sqlite"].opt_include]
-    library_dirs = [HOMEBREW_PREFIX/"lib", Formula["openssl"].opt_lib,
+    library_dirs = [HOMEBREW_PREFIX/"lib", Formula["openssl@1.1"].opt_lib,
                     Formula["sqlite"].opt_lib]
 
     cfg = prefix/"Frameworks/Python.framework/Versions/#{xy}/lib/python#{xy}/distutils/distutils.cfg"

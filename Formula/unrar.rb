@@ -1,14 +1,14 @@
 class Unrar < Formula
   desc "Extract, view, and test RAR archives"
   homepage "https://www.rarlab.com/"
-  url "https://www.rarlab.com/rar/unrarsrc-5.7.5.tar.gz"
-  sha256 "e1c2fddaa87a88b1535bfc10ca484f3c5af4e5a55fbb933f8819e26203bbe2ee"
+  url "https://www.rarlab.com/rar/unrarsrc-5.9.1.tar.gz"
+  sha256 "0eb1d1b8e02102fccae775a6d6b79336b69e2cf90e2045de92594dcfb58de100"
 
   bottle do
     cellar :any
-    sha256 "8d30a945be9a3b5a668d3c558f40dd22d3ba1e4b44e3f3d3a1b004b594d66fbf" => :mojave
-    sha256 "3d5b170619917ee01c311696c457eb1b75310cc13cbe5cc7fc57c37e17c31a44" => :high_sierra
-    sha256 "497e8198704df625b13b9a820fdd13c49c1f8180d7f587a1e22fa98c39fc7d10" => :sierra
+    sha256 "778a5ef87bc4c4f0c76ad4c774451c2aa03692a7555780e07dd02fdd17e5d961" => :catalina
+    sha256 "8f50cbc0555c19d451f85fbbaaf081586bf9f0bdf788f53c6041aacc7be2bf25" => :mojave
+    sha256 "dd7813a21417cdc5741ca03dfb51bbcf104d1e7430c487aa82012c709d4c70e7" => :high_sierra
   end
 
   def install
@@ -33,7 +33,7 @@ class Unrar < Formula
     data =  "UmFyIRoHAM+QcwAADQAAAAAAAACaCHQggDIACQAAAAkAAAADtPej1LZwZE" \
             "QUMBIApIEAAGRpcmVjdG9yeVxmaWxlLnR4dEhvbWVicmV3CsQ9ewBABwA="
 
-    rarpath.write data.unpack("m").first
+    rarpath.write data.unpack1("m")
     assert_equal contentpath, `#{bin}/unrar lb #{rarpath}`.strip
     assert_equal 0, $CHILD_STATUS.exitstatus
 

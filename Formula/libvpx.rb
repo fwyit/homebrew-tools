@@ -1,15 +1,15 @@
 class Libvpx < Formula
   desc "VP8/VP9 video codec"
   homepage "https://www.webmproject.org/code/"
-  url "https://github.com/webmproject/libvpx/archive/v1.8.0.tar.gz"
-  sha256 "86df18c694e1c06cc8f83d2d816e9270747a0ce6abe316e93a4f4095689373f6"
+  url "https://github.com/webmproject/libvpx/archive/v1.8.2.tar.gz"
+  sha256 "8735d9fcd1a781ae6917f28f239a8aa358ce4864ba113ea18af4bb2dc8b474ac"
   head "https://chromium.googlesource.com/webm/libvpx", :using => :git
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "8acc007976c337e0ea107c07e984c7924516b1ce70fe7a862af480de0998cb96" => :mojave
-    sha256 "4afe71bb1bf3e449e9ed854f04fbed14338be71a2f60122c09f37da8faa9d1ef" => :high_sierra
-    sha256 "bc0817cc35d2437b579572842bcfdfb846a26a241986b801b86d5ec52bf2cf51" => :sierra
+    sha256 "7e25f992f2da9c062dae318891f87bbe8fb25b92d6ad96d55b471714a26f54f5" => :catalina
+    sha256 "7441bce9e2934582467b4d1f5c7a5669f0f2867f89d9766a987d0145d3354e29" => :mojave
+    sha256 "a92327055c847f4444248a9d47650d999baffd27d7e073a42b7a67c0fccd6c33" => :high_sierra
   end
 
   depends_on "yasm" => :build
@@ -21,6 +21,7 @@ class Libvpx < Formula
       --disable-examples
       --disable-unit-tests
       --enable-pic
+      --enable-vp9-highbitdepth
     ]
 
     # https://bugs.chromium.org/p/webm/issues/detail?id=1475

@@ -1,19 +1,33 @@
-# Documentation: https://docs.brew.sh/Formula-Cookbook
-#                https://www.rubydoc.info/github/Homebrew/brew/master/Formula
-# PLEASE REMOVE ALL GENERATED COMMENTS BEFORE SUBMITTING YOUR PULL REQUEST!
 class Dive < Formula
-  desc "A tool for exploring each layer in a docker image"
+  desc "Tool for exploring each layer in a docker image"
   homepage "https://github.com/wagoodman/dive"
-  url "https://github.com/wagoodman/dive/releases/download/v0.6.0/dive_0.6.0_darwin_amd64.tar.gz"
-  version "0.6.0"
-  sha256 "6c671106cd01831fa100a20f795a8c2e89ba4f2f401b5aaf6d4f11de2858ee95"
-  # depends_on "cmake" => :build
+  url "https://github.com/wagoodman/dive.git",
+    :tag      => "v0.9.1",
+    :revision => "bfcfc54ee34b623274a91ca48379ac229b5415c2"
+
+  bottle do
+    cellar :any_skip_relocation
+    rebuild 1
+    sha256 "40f8ae5dc1ace5e588ddfec9355e9a0377929ffa13b2480c1220aca2cd1ec718" => :catalina
+    sha256 "278e4cd358ae21365dc261a623f2dc976f0467ad56e352eadec9dac4de568fc9" => :mojave
+    sha256 "34dcd82075559df6a0a47081c7860cfc3450f58284ab0abff694f69d48df9f28" => :high_sierra
+  end
+
+  depends_on "go" => :build
 
   def install
-    bin.install "dive"
+    system "go", "build", "-ldflags", "-s -w -X main.version=#{version}", "-trimpath", "-o", bin/"dive"
+    prefix.install_metafiles
   end
 
   test do
-    system "dive --help"
+    (testpath/"Dockerfile").write <<~EOS
+      FROM alpine
+      ENV test=homebrew-core
+      RUN echo "hello"
+    EOS
+
+    assert_match "dive #{version}", shell_output("#{bin}/dive version")
+    assert_match "Building image", shell_output("CI=true #{bin}/dive build .", 1)
   end
 end
