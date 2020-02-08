@@ -1,16 +1,15 @@
 class GnuSed < Formula
   desc "GNU implementation of the famous stream editor"
   homepage "https://www.gnu.org/software/sed/"
-  url "https://ftp.gnu.org/gnu/sed/sed-4.7.tar.xz"
-  mirror "https://ftpmirror.gnu.org/sed/sed-4.7.tar.xz"
-  sha256 "2885768cd0a29ff8d58a6280a270ff161f6a3deb5690b2be6c49f46d4c67bd6a"
+  url "https://ftp.gnu.org/gnu/sed/sed-4.8.tar.xz"
+  mirror "https://ftpmirror.gnu.org/sed/sed-4.8.tar.xz"
+  sha256 "f79b0cfea71b37a8eeec8490db6c5f7ae7719c35587f21edb0617f370eeff633"
 
   bottle do
     cellar :any_skip_relocation
-    rebuild 2
-    sha256 "f519013891bc629f64d4ebbd37869007b73480f501185d1e7d1e7e771fe66502" => :mojave
-    sha256 "8ad20319d307e03c34ba4c38027b27d091b3774dc5f8daaaba41c3b02b76ebd0" => :high_sierra
-    sha256 "b195a1be46f37611386c845da0452fe7d406394376a57d21d6df1d55dd1856d1" => :sierra
+    sha256 "726be75d6d7155820b408a10e5c1a5ba1406374a7fc167af62524a4f4bbbc099" => :catalina
+    sha256 "093f16752e7dfb115c055f20aed090108b94edd47c40f5e50878d961359251b2" => :mojave
+    sha256 "865abe618c67037a4a419a05e0df2c6814fb3abdd6f631ea546aeba0aaf8eb78" => :high_sierra
   end
 
   conflicts_with "ssed", :because => "both install share/info/sed.info"
@@ -21,6 +20,9 @@ class GnuSed < Formula
       --disable-dependency-tracking
       --program-prefix=g
     ]
+
+    # Work around a gnulib issue with macOS Catalina
+    args << "gl_cv_func_ftello_works=yes"
 
     system "./configure", *args
     system "make", "install"

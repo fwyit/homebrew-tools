@@ -1,31 +1,27 @@
 class Hub < Formula
   desc "Add GitHub support to git on the command-line"
   homepage "https://hub.github.com/"
-  url "https://github.com/github/hub/archive/v2.11.2.tar.gz"
-  sha256 "1a80685d3d4fe14012c4f5e5cda9a2c5fe680a81729e692008aa1414f8e1f972"
+  url "https://github.com/github/hub/archive/v2.14.1.tar.gz"
+  sha256 "62c977a3691c3841c8cde4906673a314e76686b04d64cab92f3e01c3d778eb6f"
   head "https://github.com/github/hub.git"
 
   bottle do
     cellar :any_skip_relocation
-    sha256 "5a628edefdd1a57f8f6a507ba44e78ed51032fa7c077d41bc269a23205e4bcd9" => :mojave
-    sha256 "77ce20f18bbcd877b90be0abed790b4c3c5b8f87788e5676c271cfa2f31eb570" => :high_sierra
-    sha256 "c7646f8ebab05d6b1e47e52831089dbdb79f9c5a83f0f62468f8955293fd2750" => :sierra
+    sha256 "f092116bb42f4149b0a2abb25ee1752eec32923fe9bd0772607404b3da86e866" => :catalina
+    sha256 "671f391bbbd66507a7a9f871ee7222326eb54471478a2e5e1e6122cb58534425" => :mojave
+    sha256 "bb9269b14335df7a77cbe8072df072471c980b497c06f33b603744a60fc09d95" => :high_sierra
   end
 
   depends_on "go" => :build
 
   def install
-    ENV["GOPATH"] = buildpath
-    (buildpath/"src/github.com/github/hub").install buildpath.children
-    cd "src/github.com/github/hub" do
-      system "make", "install", "prefix=#{prefix}"
+    system "make", "install", "prefix=#{prefix}"
 
-      prefix.install_metafiles
+    prefix.install_metafiles
 
-      bash_completion.install "etc/hub.bash_completion.sh"
-      zsh_completion.install "etc/hub.zsh_completion" => "_hub"
-      fish_completion.install "etc/hub.fish_completion" => "hub.fish"
-    end
+    bash_completion.install "etc/hub.bash_completion.sh"
+    zsh_completion.install "etc/hub.zsh_completion" => "_hub"
+    fish_completion.install "etc/hub.fish_completion" => "hub.fish"
   end
 
   test do

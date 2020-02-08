@@ -1,20 +1,20 @@
 class Pyenv < Formula
   desc "Python version management"
   homepage "https://github.com/pyenv/pyenv"
-  url "https://github.com/pyenv/pyenv/archive/v1.2.11.tar.gz"
-  sha256 "3756c0e386c3a6a6b36f2f8d6cc55441cc3aae1190f74c01f15d7dcdc0cae6fa"
+  url "https://github.com/pyenv/pyenv/archive/v1.2.16.tar.gz"
+  sha256 "a4cdda5902a2507518db460c375fcec5eee3ce7e3527a3e623bfb0b3c7543ccb"
   version_scheme 1
   head "https://github.com/pyenv/pyenv.git"
 
   bottle do
     cellar :any
-    sha256 "54876153bcbe6bfdecd0b232ab112571120c84ae8c11e610c07775026e403818" => :mojave
-    sha256 "d12b5973fd18eff3909998ec8c757e2f2074984df58939c528dc3467b703671a" => :high_sierra
-    sha256 "9c333a6b41589f4fe0a6e689043e983eb21f89500182040eaa99cf6efc230ecb" => :sierra
+    sha256 "1da51fb67d5aac04bda57820d4bf9cc4454a6674a99c98fec4e42c8a32fa8dac" => :catalina
+    sha256 "e16a7e18f0c439d1e8281cc512296d2cf289e538a2364c1b83e4384bf53c2a43" => :mojave
+    sha256 "97ce8482cadd990833d98bee07dbb9ebd71bdd62b38b24248a10942e50519797" => :high_sierra
   end
 
   depends_on "autoconf"
-  depends_on "openssl"
+  depends_on "openssl@1.1"
   depends_on "pkg-config"
   depends_on "readline"
 

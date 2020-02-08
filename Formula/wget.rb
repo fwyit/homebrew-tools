@@ -3,12 +3,12 @@ class Wget < Formula
   homepage "https://www.gnu.org/software/wget/"
   url "https://ftp.gnu.org/gnu/wget/wget-1.20.3.tar.gz"
   sha256 "31cccfc6630528db1c8e3a06f6decf2a370060b982841cfab2b8677400a5092e"
-  revision 1
+  revision 2
 
   bottle do
-    sha256 "96a58c26308afae033e6d6325e7af3f20618b4ca84f2d265ba3ca16a5eae7e65" => :mojave
-    sha256 "8ec2c004992bc9b836a84b560b9c93fe2d46f13c27aac246ab3b72379dfe5c34" => :high_sierra
-    sha256 "cb786d5bf247dc71c57081dfbdbb0762ea31e695954cdb02d75c3e34bc3d1188" => :sierra
+    sha256 "ef65c759c5097a36323fa9c77756468649e8d1980a3a4e05695c05e39568967c" => :catalina
+    sha256 "28f4090610946a4eb207df102d841de23ced0d06ba31cb79e040d883906dcd4f" => :mojave
+    sha256 "91dd0caca9bd3f38c439d5a7b6f68440c4274945615fae035ff0a369264b8a2f" => :high_sierra
   end
 
   head do
@@ -22,14 +22,16 @@ class Wget < Formula
 
   depends_on "pkg-config" => :build
   depends_on "libidn2"
-  depends_on "openssl"
+  depends_on "openssl@1.1"
 
   def install
     system "./bootstrap", "--skip-po" if build.head?
     system "./configure", "--prefix=#{prefix}",
                           "--sysconfdir=#{etc}",
                           "--with-ssl=openssl",
-                          "--with-libssl-prefix=#{Formula["openssl"].opt_prefix}",
+                          "--with-libssl-prefix=#{Formula["openssl@1.1"].opt_prefix}",
+                          # Work around a gnulib issue with macOS Catalina
+                          "gl_cv_func_ftello_works=yes",
                           "--disable-debug",
                           "--disable-pcre",
                           "--disable-pcre2",

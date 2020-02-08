@@ -1,13 +1,13 @@
 class Squid < Formula
   desc "Advanced proxy caching server for HTTP, HTTPS, FTP, and Gopher"
   homepage "http://www.squid-cache.org/"
-  url "http://www.squid-cache.org/Versions/v4/squid-4.5.tar.xz"
-  sha256 "553edf76d6ee9a1627af9c2be7be850c14cd6836170b3d6c1393fd700d44ccc5"
+  url "http://www.squid-cache.org/Versions/v4/squid-4.10.tar.xz"
+  sha256 "98f0100afd8a42ea5f6b81eb98b0e4b36d7a54beab1c73d2f1705ab49b025f1f"
 
   bottle do
-    sha256 "dc48028ff57b2a850792a9009bfc0d10acdebdeb6153680df1bc659f10c25718" => :mojave
-    sha256 "4c10e05a05409468cb46c3f488d943ba5e50213928a53b4324d46502f8f8ec83" => :high_sierra
-    sha256 "954bc51b342e278f3192fc136694414d035a39f322e94f1afa8d04ab528b4549" => :sierra
+    sha256 "b317cad793854ed6b0c3933ebec75194383d5c2b47e5f868027aaa9e9decb8f9" => :catalina
+    sha256 "116495c487377979f407c4c77a3b904cf06539deaf4fc86d02843d16e224a1d1" => :mojave
+    sha256 "a920686eea11ddb1d3f7fa2ac6a3cd12900e1f5eb181a3f920673e4076f60370" => :high_sierra
   end
 
   head do
@@ -18,7 +18,7 @@ class Squid < Formula
     depends_on "libtool" => :build
   end
 
-  depends_on "openssl"
+  depends_on "openssl@1.1"
 
   def install
     # https://stackoverflow.com/questions/20910109/building-squid-cache-on-os-x-mavericks
@@ -76,11 +76,18 @@ class Squid < Formula
   end
 
   test do
-    # This test should start squid and then check it runs correctly.
-    # However currently dies under the sandbox and "Current Directory"
-    # seems to be set hard on HOMEBREW_PREFIX/var/cache/squid.
-    # https://github.com/Homebrew/homebrew/pull/44348#issuecomment-143477353
-    # If you can fix this, please submit a PR. Thank you!
     assert_match version.to_s, shell_output("#{sbin}/squid -v")
+
+    pid = fork do
+      exec "#{sbin}/squid"
+    end
+    sleep 2
+
+    begin
+      system "#{sbin}/squid", "-k", "check"
+    ensure
+      exec "#{sbin}/squid -k interrupt"
+      Process.wait(pid)
+    end
   end
 end
