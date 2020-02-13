@@ -6,12 +6,12 @@ cask 'bettertouchtool' do
     # bettertouchtool.net/releases was verified as official when first introduced to the cask
     url "https://bettertouchtool.net/releases/btt#{version}_final_10_9.zip"
   else
-    version '3.04'
-    sha256 '2ea934754adc6fafa09b51d82d17ff2a6f6bddf3c2fe73e33b9b3431918effce'
+    version '3.321'
+    sha256 '1d33e09fd58b7601fcf61e6f4e2fd9267708e22d0e66df94666ab5463f53d624'
 
     # bettertouchtool.net/releases was verified as official when first introduced to the cask
     url "https://bettertouchtool.net/releases/btt#{version}.zip"
-    appcast 'https://bettertouchtool.net/releases/'
+    appcast 'https://www.corecode.io/macupdater/appcasts/bettertouchtool.txt'
   end
 
   name 'BetterTouchTool'
@@ -20,8 +20,6 @@ cask 'bettertouchtool' do
   auto_updates true
 
   app 'BetterTouchTool.app'
-
-  uninstall login_item: 'BetterTouchTool'
 
   zap trash: [
                '~/Library/Preferences/com.hegenberg.BetterTouchTool.plist',
