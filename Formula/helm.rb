@@ -1,50 +1,19 @@
-class Helm < Formula
-  desc "The Kubernetes package manager"
+class Helm3 < Formula
+  desc "The Kubernetes package manager with version 3"
   homepage "https://helm.sh/"
-  url "https://github.com/helm/helm.git",
-      :tag      => "v3.0.3",
-      :revision => "ac925eb7279f4a6955df663a0128044a8a6b7593"
-  head "https://github.com/helm/helm.git"
+  version "v3.1.1"
+  url "https://get.helm.sh/helm-#{version}-darwin-amd64.tar.gz"
+  sha256 "2ce00e6c44ba18fbcbec21c493476e919128710d480789bb35bd228ae695cd66"
 
-  bottle do
-    cellar :any_skip_relocation
-    sha256 "5987c80ea21063f3c26a799889ad3e0b35c73275bd3579e5a1f6785d6f3f43d5" => :catalina
-    sha256 "29239b6d467e3ebe810645e45a4635a5e239ee6f1e1bd33d7bfa33e02a79ceae" => :mojave
-    sha256 "dd5a05fa985c1a696a5b7db0aa7548e0de31094569558eabc2b2cdc4dac24264" => :high_sierra
-  end
-
-  depends_on "go" => :build
+  # depends_on "cmake" => :build
+  conflicts_with "helm2", :because => "helm2 and helm3 is uncompatibal"
 
   def install
-    ENV["GOPATH"] = buildpath
-    ENV["GLIDE_HOME"] = HOMEBREW_CACHE/"glide_home/#{name}"
-    ENV.prepend_create_path "PATH", buildpath/"bin"
-    ENV["TARGETS"] = "darwin/amd64"
-    dir = buildpath/"src/helm.sh/helm"
-    dir.install buildpath.children - [buildpath/".brew_home"]
-
-    cd dir do
-      system "make", "build"
-
-      bin.install "bin/helm"
-      man1.install Dir["docs/man/man1/*"]
-
-      output = Utils.popen_read("SHELL=bash #{bin}/helm completion bash")
-      (bash_completion/"helm").write output
-
-      output = Utils.popen_read("SHELL=zsh #{bin}/helm completion zsh")
-      (zsh_completion/"_helm").write output
-
-      prefix.install_metafiles
-    end
+    bin.install "helm" => "helm3"
+    bin.install "helm" => "helm"
   end
 
   test do
-    system "#{bin}/helm", "create", "foo"
-    assert File.directory? "#{testpath}/foo/charts"
-
-    version_output = shell_output("#{bin}/helm version 2>&1")
-    assert_match "GitTreeState:\"clean\"", version_output
-    assert_match stable.instance_variable_get(:@resource).instance_variable_get(:@specs)[:revision], version_output if build.stable?
+    system "false"
   end
 end
