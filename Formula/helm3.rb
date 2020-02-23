@@ -10,7 +10,7 @@ class Helm3 < Formula
 
   def install
     bin.install "helm" => "helm3"
-    bin.install "helm" => "helm"
+    # bin.install "helm" => "helm"
   end
 
   test do
