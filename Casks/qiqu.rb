@@ -1,4 +1,4 @@
-cask 'iqiyi-meeting' do
+cask 'qiqu' do
   version '2.9.1'
   sha256 'bf1366bbe47c432bb67ea1d8343b3fcf277743425819f499fee1a8f66483a6f7'
 
