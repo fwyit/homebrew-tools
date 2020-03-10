@@ -1,6 +1,6 @@
 cask '1password' do
-  version '7.3'
-  sha256 'fd23cb03afc13cd34690d1a4347d8862517da60ccd234ce873bffd557e974c35'
+  version '7.4.3'
+  sha256 '8a0db05c08c827cd2f636eb2bf5d97926c3f26eb5731a016add704e0535b1b06'
 
   url "https://c.1password.com/dist/1P/mac#{version.major}/1Password-#{version}.zip"
   appcast "https://app-updates.agilebits.com/product_history/OPM#{version.major}"
@@ -8,21 +8,15 @@ cask '1password' do
   homepage 'https://1password.com/'
 
   auto_updates true
-  depends_on macos: '>= :sierra'
+  depends_on macos: '>= :high_sierra'
 
   app "1Password #{version.major}.app"
 
   zap trash: [
-               "~/Library/Application Scripts/2BUA8C4S2C.com.agilebits.onepassword#{version.major}-helper",
-               "~/Library/Application Scripts/com.agilebits.onepassword#{version.major}",
-               "~/Library/Application Scripts/com.agilebits.onepassword#{version.major}-launcher",
-               '~/Library/Application Scripts/com.agilebits.onepasswordnativemessaginghost',
-               "~/Library/Containers/2BUA8C4S2C.com.agilebits.onepassword#{version.major}-helper",
-               "~/Library/Containers/com.agilebits.onepassword#{version.major}",
-               "~/Library/Containers/com.agilebits.onepassword#{version.major}-launcher",
-               '~/Library/Containers/com.agilebits.onepasswordnativemessaginghost',
+               '~/Library/Application Scripts/*.agilebits.onepassword*',
+               '~/Library/Containers/*.agilebits.onepassword*',
                '~/Library/Group Containers/2BUA8C4S2C.com.agilebits',
                '~/Library/Logs/1Password',
-               "~/Library/Preferences/com.agilebits.onepassword#{version.major}.plist",
+               '~/Library/Preferences/com.agilebits.onepassword*',
              ]
 end

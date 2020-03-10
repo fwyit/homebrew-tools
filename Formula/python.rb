@@ -30,6 +30,11 @@ class Python < Formula
   depends_on "sqlite"
   depends_on "xz"
 
+  uses_from_macos "bzip2"
+  uses_from_macos "libffi"
+  uses_from_macos "ncurses"
+  uses_from_macos "zlib"
+
   skip_clean "bin/pip3", "bin/pip-3.4", "bin/pip-3.5", "bin/pip-3.6", "bin/pip-3.7"
   skip_clean "bin/easy_install3", "bin/easy_install-3.4", "bin/easy_install-3.5", "bin/easy_install-3.6", "bin/easy_install-3.7"
 
@@ -290,9 +295,6 @@ class Python < Formula
       Unversioned symlinks `python`, `python-config`, `pip` etc. pointing to
       `python3`, `python3-config`, `pip3` etc., respectively, have been installed into
         #{opt_libexec}/bin
-
-      If you need Homebrew's Python 2.7 run
-        brew install python@2
 
       You can install Python packages with
         pip3 install <package>

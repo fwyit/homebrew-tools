@@ -1,8 +1,8 @@
 class YoutubeDl < Formula
   desc "Download YouTube videos from the command-line"
   homepage "https://ytdl-org.github.io/youtube-dl/"
-  url "https://github.com/ytdl-org/youtube-dl/releases/download/2020.01.24/youtube-dl-2020.01.24.tar.gz"
-  sha256 "0b1dcc96d204984df1ee364e81cddd5645421f6065d2815472258ccdad5c36ff"
+  url "https://github.com/ytdl-org/youtube-dl/releases/download/2020.03.08/youtube-dl-2020.03.08.tar.gz"
+  sha256 "76114c82015386eda24fe110e2c24a35f0551ce298b915e1c48c2acb495073f5"
 
   head do
     url "https://github.com/ytdl-org/youtube-dl.git"
@@ -21,7 +21,9 @@ class YoutubeDl < Formula
   end
 
   test do
-    system "#{bin}/youtube-dl", "--simulate", "https://www.youtube.com/watch?v=he2a4xK8ctk"
-    system "#{bin}/youtube-dl", "--simulate", "--yes-playlist", "https://www.youtube.com/watch?v=7FlzFH9xOF8&list=PLRuS3NbVmMIq4XypJdggVfUVJNRZjbfCR"
+    # commit history of homebrew-core repo
+    system "#{bin}/youtube-dl", "--simulate", "https://www.youtube.com/watch?v=pOtd1cbOP7k"
+    # homebrew playlist
+    system "#{bin}/youtube-dl", "--simulate", "--yes-playlist", "https://www.youtube.com/watch?v=pOtd1cbOP7k&list=PLMsZ739TZDoLj9u_nob8jBKSC-mZb0Nhj"
   end
 end
