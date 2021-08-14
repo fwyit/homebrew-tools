@@ -5,30 +5,42 @@ class Vault < Formula
   desc "Secures, stores, and tightly controls access to secrets"
   homepage "https://vaultproject.io/"
   url "https://github.com/hashicorp/vault.git",
-      :tag      => "v1.3.3",
-      :revision => "8e872c4ad94cb1f193a0fb239ae856e1fdf4bdb0"
+      # :tag      => "v1.3.3",
+      # :revision => "8e872c4ad94cb1f193a0fb239ae856e1fdf4bdb0"
+      :tag      => "v1.6.3",
+      :revision => "b540be4b7ec48d0dd7512c8d8df9399d6bf84d76"
   head "https://github.com/hashicorp/vault.git"
 
-  bottle do
-    cellar :any_skip_relocation
-    sha256 "953502f351f9e6cd8418a39ba8e4dc0268e429e36147f7257f6bdde9af11f486" => :catalina
-    sha256 "f042d5041880d92b10cda1ea66a93261c656182e7f0962f7b682034cfa5dba39" => :mojave
-    sha256 "0eb9d16459cf780841572adb256ebb8ac27675b07c00143d297287e9358197f9" => :high_sierra
-  end
+  # bottle do
+  #   cellar :any_skip_relocation
+  #   sha256 "953502f351f9e6cd8418a39ba8e4dc0268e429e36147f7257f6bdde9af11f486" => :catalina
+  #   sha256 "f042d5041880d92b10cda1ea66a93261c656182e7f0962f7b682034cfa5dba39" => :mojave
+  #   sha256 "0eb9d16459cf780841572adb256ebb8ac27675b07c00143d297287e9358197f9" => :high_sierra
+  # end
 
-  depends_on "go@1.12" => :build
+  depends_on "fwyit/tools/go@1.15" => :build
   depends_on "gox" => :build
+  depends_on "yarn" => :build
+  depends_on  "node@10" => :build
 
   def install
     ENV["GOPATH"] = buildpath
+    ENV["GOPROXY"] = "https://goproxy.cn,direct"
 
     contents = buildpath.children - [buildpath/".brew_home"]
     (buildpath/"src/github.com/hashicorp/vault").install contents
 
     (buildpath/"bin").mkpath
 
+
     cd "src/github.com/hashicorp/vault" do
-      system "make", "dev"
+      # system "make", "release"
+      # system "make", "dev"
+      system "go", "get"
+      system "yarn", "config", "set", "registry=https://registry.npm.taobao.org"
+      system "make", "static-dist"
+      # system "make", "bin"
+      system "make", "dev-ui"
       bin.install "bin/vault"
       prefix.install_metafiles
     end
