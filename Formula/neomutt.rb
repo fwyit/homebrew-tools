@@ -1,37 +1,59 @@
 class Neomutt < Formula
   desc "E-mail reader with support for Notmuch, NNTP and much more"
   homepage "https://neomutt.org/"
-  url "https://github.com/neomutt/neomutt/archive/20191207.tar.gz"
-  sha256 "1618873bd43915d437c5957f19ec2c4ecef6954a5aa647009b98f574ec63410e"
-  head "https://github.com/neomutt/neomutt.git"
+  url "https://github.com/neomutt/neomutt/archive/20211029.tar.gz"
+  sha256 "08245cfa7aec80b895771fd1adcbb7b86e9c0434dfa64574e3c8c4d692aaa078"
+  license "GPL-2.0-or-later"
+  head "https://github.com/neomutt/neomutt.git", branch: "master"
 
   bottle do
-    sha256 "7ed9b6666e46a059d9d92fcc52437bf870ce901e4771ca94b231a09abc4011f0" => :catalina
-    sha256 "80ae35db309e042e9673e6ca57667672a8e5ec887d7fe1476c698179c5da8a22" => :mojave
-    sha256 "6938e79bb2a74799c87bc30b3b84f223ce6134df07b796f49eea374a333b4504" => :high_sierra
+    sha256 arm64_big_sur: "4c237578e16c4e2206e9bf8fc60ec5748efa12a3709a0676b6b2438ade7da3f5"
+    sha256 big_sur:       "42d34fcc9c1b3d97623ae96833415c2c79b87453cd3c19d00e39b919a6c6241b"
+    sha256 catalina:      "fdd0baffcb5c94b761a9ed454f1d96a8f6719eab3842f4a3239019e1085cb9f7"
+    sha256 x86_64_linux:  "edfcc9cb08d618770605f3a0b9d6c97304277078b049675adc1629c2b1b333cd"
   end
 
   depends_on "docbook-xsl" => :build
   depends_on "gettext"
   depends_on "gpgme"
-  depends_on "libidn"
+  depends_on "libidn2"
   depends_on "lmdb"
+  depends_on "lua"
   depends_on "notmuch"
   depends_on "openssl@1.1"
   depends_on "tokyo-cabinet"
 
+  uses_from_macos "libxslt" => :build # for xsltproc
+  uses_from_macos "cyrus-sasl"
+  uses_from_macos "krb5"
+  uses_from_macos "ncurses"
+  uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "pkg-config" => :build
+  end
+
   def install
-    ENV["XML_CATALOG_FILES"] = "#{etc}/xml/catalog"
-    system "./configure", "--prefix=#{prefix}",
-                          "--enable-gpgme",
-                          "--with-gpgme=#{Formula["gpgme"].opt_prefix}",
-                          "--gss",
-                          "--lmdb",
-                          "--notmuch",
-                          "--sasl",
-                          "--tokyocabinet",
-                          "--with-ssl=#{Formula["openssl@1.1"].opt_prefix}",
-                          "--with-ui=ncurses"
+    ENV["XML_CATALOG_FILES"] = etc/"xml/catalog"
+
+    args = %W[
+      --prefix=#{prefix}
+      --gss
+      --disable-idn
+      --idn2
+      --lmdb
+      --notmuch
+      --sasl
+      --tokyocabinet
+      --with-gpgme=#{Formula["gpgme"].opt_prefix}
+      --with-lua=#{Formula["lua"].opt_prefix}
+      --with-ssl=#{Formula["openssl@1.1"].opt_prefix}
+      --with-ui=ncurses
+    ]
+
+    args << "--pkgconf" if OS.linux?
+
+    system "./configure", *args
     system "make", "install"
   end
 

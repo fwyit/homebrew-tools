@@ -1,34 +1,45 @@
 class Git < Formula
   desc "Distributed revision control system"
   homepage "https://git-scm.com"
-  # Note: Please keep these values in sync with git-gui.rb when updating.
-  url "https://www.kernel.org/pub/software/scm/git/git-2.25.0.tar.xz"
-  sha256 "c060291a3ffb43d7c99f4aa5c4d37d3751cf6bca683e7344ea407ea504d9a8d0"
-  revision 1
-  head "https://github.com/git/git.git", :shallow => false
+  url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.35.1.tar.xz"
+  sha256 "d768528e6443f65a203036266f1ca50f9d127ba89751e32ead37117ed9191080"
+  license "GPL-2.0-only"
+  head "https://github.com/git/git.git", branch: "master"
+
+  livecheck do
+    url "https://www.kernel.org/pub/software/scm/git/"
+    regex(/href=.*?git[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    sha256 "9ab68a09b14009dd3c28fcd3e6ef98213f675887615cab5c67d62a026ccc019b" => :catalina
-    sha256 "54508f6ad675b1a3964d8576b9123d1459f6edf4f8847e229b56ec76cf49014b" => :mojave
-    sha256 "cac935cce4729d0cc61ce0b3cda18848d811c6e51a03498b6f44e6f3764b3b9e" => :high_sierra
+    sha256 arm64_monterey: "e19e56133d9990f9097a31b7720fe307e4ba87d79019cce086ad8f1e25993012"
+    sha256 arm64_big_sur:  "09773f8caeb9490d53dc8fbf552dd4b83c655c2219fec38202d351ab459973fa"
+    sha256 monterey:       "ec4d252f6ac282f2770bcf18af011e8032d1f43fc17af39e54465bb8148d1d2f"
+    sha256 big_sur:        "212244b5acaaa49fdd33b710fc6795c457aa25e89a854d39407bf36532137ef8"
+    sha256 catalina:       "362820c1071869ed3a31ecfb8cb9c022aaef715745348f72f975b90b94091ef8"
+    sha256 x86_64_linux:   "34b29f7801095ae255f03bae5d0dde6fc98910811f17266e8b4af73310c3c314"
   end
 
   depends_on "gettext"
   depends_on "pcre2"
 
-  if MacOS.version < :yosemite
-    depends_on "openssl@1.1"
-    depends_on "curl"
+  uses_from_macos "curl", since: :catalina # macOS < 10.15.6 has broken cert path logic
+  uses_from_macos "expat"
+  uses_from_macos "zlib", since: :high_sierra
+
+  on_linux do
+    depends_on "linux-headers@4.4"
+    depends_on "openssl@1.1" # Uses CommonCrypto on macOS
   end
 
   resource "html" do
-    url "https://www.kernel.org/pub/software/scm/git/git-htmldocs-2.25.0.tar.xz"
-    sha256 "a99d83260ff903102bf7556e673c1535e4b0fb276a718a5d2f32b501e39a000d"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-htmldocs-2.35.1.tar.xz"
+    sha256 "ca2f0bd4a9d24d9b6b3a021f11b8eacee863948c67a4cc0ff6d7adef8137ea18"
   end
 
   resource "man" do
-    url "https://www.kernel.org/pub/software/scm/git/git-manpages-2.25.0.tar.xz"
-    sha256 "d396777bdd69dc2db06a49da6971a883fd95fe16ad1dcca7e6b491686658c8bd"
+    url "https://mirrors.edge.kernel.org/pub/software/scm/git/git-manpages-2.35.1.tar.xz"
+    sha256 "e4e3a751f2c05959222c3ea2f0f09481700eca8f915d1398bb270eb6846c3803"
   end
 
   resource "Net::SMTP::SSL" do
@@ -40,7 +51,6 @@ class Git < Formula
     # If these things are installed, tell Git build system not to use them
     ENV["NO_FINK"] = "1"
     ENV["NO_DARWIN_PORTS"] = "1"
-    ENV["NO_R_TO_GCC_LINKER"] = "1" # pass arguments to LD correctly
     ENV["PYTHON_PATH"] = which("python")
     ENV["PERL_PATH"] = which("perl")
     ENV["USE_LIBPCRE2"] = "1"
@@ -48,25 +58,16 @@ class Git < Formula
     ENV["LIBPCREDIR"] = Formula["pcre2"].opt_prefix
     ENV["V"] = "1" # build verbosely
 
-    perl_version = Utils.popen_read("perl --version")[/v(\d+\.\d+)(?:\.\d+)?/, 1]
+    perl_version = Utils.safe_popen_read("perl", "--version")[/v(\d+\.\d+)(?:\.\d+)?/, 1]
 
-    ENV["PERLLIB_EXTRA"] = %W[
-      #{MacOS.active_developer_dir}
-      /Library/Developer/CommandLineTools
-      /Applications/Xcode.app/Contents/Developer
-    ].uniq.map do |p|
-      "#{p}/Library/Perl/#{perl_version}/darwin-thread-multi-2level"
-    end.join(":")
-
-    unless quiet_system ENV["PERL_PATH"], "-e", "use ExtUtils::MakeMaker"
-      ENV["NO_PERL_MAKEMAKER"] = "1"
-    end
-
-    # Ensure we are using the correct system headers (for curl) to workaround
-    # mismatched Xcode/CLT versions:
-    # https://github.com/Homebrew/homebrew-core/issues/46466
-    if MacOS.version == :mojave && MacOS::CLT.installed? && MacOS::CLT.provides_sdk?
-      ENV["HOMEBREW_SDKROOT"] = MacOS::CLT.sdk_path(MacOS.version)
+    if OS.mac?
+      ENV["PERLLIB_EXTRA"] = %W[
+        #{MacOS.active_developer_dir}
+        /Library/Developer/CommandLineTools
+        /Applications/Xcode.app/Contents/Developer
+      ].uniq.map do |p|
+        "#{p}/Library/Perl/#{perl_version}/darwin-thread-multi-2level"
+      end.join(":")
     end
 
     # The git-gui and gitk tools are installed by a separate formula (git-gui)
@@ -82,24 +83,28 @@ class Git < Formula
       NO_TCLTK=1
     ]
 
-    if MacOS.version < :yosemite
-      openssl_prefix = Formula["openssl@1.1"].opt_prefix
-      args += %W[NO_APPLE_COMMON_CRYPTO=1 OPENSSLDIR=#{openssl_prefix}]
+    args += if OS.mac?
+      %w[NO_OPENSSL=1 APPLE_COMMON_CRYPTO=1]
     else
-      args += %w[NO_OPENSSL=1 APPLE_COMMON_CRYPTO=1]
+      openssl_prefix = Formula["openssl@1.1"].opt_prefix
+
+      %W[NO_APPLE_COMMON_CRYPTO=1 OPENSSLDIR=#{openssl_prefix}]
     end
 
     system "make", "install", *args
 
     git_core = libexec/"git-core"
+    rm git_core/"git-svn"
 
     # Install the macOS keychain credential helper
-    cd "contrib/credential/osxkeychain" do
-      system "make", "CC=#{ENV.cc}",
-                     "CFLAGS=#{ENV.cflags}",
-                     "LDFLAGS=#{ENV.ldflags}"
-      git_core.install "git-credential-osxkeychain"
-      system "make", "clean"
+    if OS.mac?
+      cd "contrib/credential/osxkeychain" do
+        system "make", "CC=#{ENV.cc}",
+                       "CFLAGS=#{ENV.cflags}",
+                       "LDFLAGS=#{ENV.ldflags}"
+        git_core.install "git-credential-osxkeychain"
+        system "make", "clean"
+      end
     end
 
     # Generate diff-highlight perl script executable
@@ -139,12 +144,7 @@ class Git < Formula
     chmod 0644, Dir["#{share}/doc/git-doc/**/*.{html,txt}"]
     chmod 0755, Dir["#{share}/doc/git-doc/{RelNotes,howto,technical}"]
 
-    # To avoid this feature hooking into the system OpenSSL, remove it
-    if MacOS.version >= :yosemite
-      rm "#{libexec}/git-core/git-imap-send"
-    end
-
-    # git-send-email needs Net::SMTP::SSL
+    # git-send-email needs Net::SMTP::SSL or Net::SMTP >= 2.34
     resource("Net::SMTP::SSL").stage do
       (share/"perl5").install "lib/Net"
     end
@@ -157,17 +157,19 @@ class Git < Formula
 
     # Set the macOS keychain credential helper by default
     # (as Apple's CLT's git also does this).
-    (buildpath/"gitconfig").write <<~EOS
-      [credential]
-      \thelper = osxkeychain
-    EOS
-    etc.install "gitconfig"
+    if OS.mac?
+      (buildpath/"gitconfig").write <<~EOS
+        [credential]
+        \thelper = osxkeychain
+      EOS
+      etc.install "gitconfig"
+    end
   end
-
 
   def caveats
     <<~EOS
       The Tcl/Tk GUIs (e.g. gitk, git-gui) are now in the `git-gui` formula.
+      Subversion interoperability (git-svn) is now in the `git-svn` formula.
     EOS
   end
 
@@ -175,16 +177,21 @@ class Git < Formula
     system bin/"git", "init"
     %w[haunted house].each { |f| touch testpath/f }
     system bin/"git", "add", "haunted", "house"
+    system bin/"git", "config", "user.name", "'A U Thor'"
+    system bin/"git", "config", "user.email", "author@example.com"
     system bin/"git", "commit", "-a", "-m", "Initial Commit"
     assert_equal "haunted\nhouse", shell_output("#{bin}/git ls-files").strip
 
-    # Check Net::SMTP::SSL was installed correctly.
-    %w[foo bar].each { |f| touch testpath/f }
-    system bin/"git", "add", "foo", "bar"
-    system bin/"git", "commit", "-a", "-m", "Second Commit"
-    assert_match "Authentication Required", shell_output(
-      "#{bin}/git send-email --to=dev@null.com --smtp-server=smtp.gmail.com " \
-      "--smtp-encryption=tls --confirm=never HEAD^ 2>&1", 255
-    )
+    # Check Net::SMTP or Net::SMTP::SSL works for git-send-email
+    on_macos do
+      %w[foo bar].each { |f| touch testpath/f }
+      system bin/"git", "add", "foo", "bar"
+      system bin/"git", "commit", "-a", "-m", "Second Commit"
+      assert_match "Authentication Required", pipe_output(
+        "#{bin}/git send-email --from=test@example.com --to=dev@null.com " \
+        "--smtp-server=smtp.gmail.com --smtp-server-port=587 " \
+        "--smtp-encryption=tls --confirm=never HEAD^ 2>&1",
+      )
+    end
   end
 end

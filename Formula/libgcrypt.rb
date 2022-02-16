@@ -1,44 +1,40 @@
 class Libgcrypt < Formula
   desc "Cryptographic library based on the code from GnuPG"
   homepage "https://gnupg.org/related_software/libgcrypt/"
-  url "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.5.tar.bz2"
-  sha256 "3b4a2a94cb637eff5bdebbcaf46f4d95c4f25206f459809339cdada0eb577ac3"
+  url "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.0.tar.bz2"
+  sha256 "6a00f5c05caa4c4acc120c46b63857da0d4ff61dc4b4b03933fa8d46013fae81"
+  license "GPL-2.0-only"
+
+  livecheck do
+    url "https://gnupg.org/ftp/gcrypt/libgcrypt/"
+    regex(/href=.*?libgcrypt[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    cellar :any
-    sha256 "7e81e6735f8eb849e26ae30a01ca6aa42c32ab53cace7a2a1867d7148abbb5fd" => :catalina
-    sha256 "d983dca1f56d0177d4ecd6ea2752457caaa5e21cdbe147e354ba1debb1ed34dd" => :mojave
-    sha256 "2188074c35a5a552ce5adad2ebd36a376bbd7309907c96fdbec2dff13c7d1863" => :high_sierra
-    sha256 "3e074f8bd2787fc5878ea8bfc31e50e596222c019054d83465b74e93328f71f3" => :sierra
+    sha256 cellar: :any,                 arm64_monterey: "814ad8451d7a20b03590289dcea6232d17412ffb910886fc8ae8b903de4c38b3"
+    sha256 cellar: :any,                 arm64_big_sur:  "9421cc3b2166199f598f523123048e28001d20fe549e15be4f8ff68672ca34c2"
+    sha256 cellar: :any,                 monterey:       "a85e017efead8890447ef3dd82a0d5abdcb4ac1d55c67ac11ec4fc8b955258a8"
+    sha256 cellar: :any,                 big_sur:        "f41a416b42273557a1747c89b936160147bba984edf90d05dcdd90977255c4b2"
+    sha256 cellar: :any,                 catalina:       "744c2e13d08b46aceba533ff905cf61eebf84030e81146db3eb708a226709227"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "938afdcee08b2d6e0cd1b5c4b125c1ff693848e0adc621283b4f3486ad2b54a4"
   end
 
   depends_on "libgpg-error"
 
   def install
-    # Temporary hack to get libgcrypt building on macOS 10.12 and 10.11 with XCode 8.
-    # Seems to be a Clang issue rather than an upstream one, so
-    # keep checking whether or not this is necessary.
-    # Should be reported to GnuPG if still an issue when near stable.
-    # https://github.com/Homebrew/homebrew-core/issues/1957
-    ENV.O1 if DevelopmentTools.clang_build_version == 800
-
     system "./configure", "--disable-dependency-tracking",
                           "--disable-silent-rules",
                           "--enable-static",
                           "--prefix=#{prefix}",
                           "--disable-asm",
-                          "--with-libgpg-error-prefix=#{Formula["libgpg-error"].opt_prefix}",
-                          "--disable-jent-support" # Requires ENV.O0, which is unpleasant.
+                          "--with-libgpg-error-prefix=#{Formula["libgpg-error"].opt_prefix}"
+
+    # The jitter entropy collector must be built without optimisations
+    ENV.O0 { system "make", "-C", "random", "rndjent.o", "rndjent.lo" }
 
     # Parallel builds work, but only when run as separate steps
     system "make"
-    # Slightly hideous hack to help `make check` work in
-    # normal place on >10.10 where SIP is enabled.
-    # https://github.com/Homebrew/homebrew-core/pull/3004
-    # https://bugs.gnupg.org/gnupg/issue2056
-    MachO::Tools.change_install_name("#{buildpath}/tests/.libs/random",
-                                     "#{lib}/libgcrypt.20.dylib",
-                                     "#{buildpath}/src/.libs/libgcrypt.20.dylib")
+    MachO.codesign!("#{buildpath}/tests/.libs/random") if OS.mac? && Hardware::CPU.arm?
 
     system "make", "check"
     system "make", "install"

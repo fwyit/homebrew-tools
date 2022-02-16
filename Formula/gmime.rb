@@ -1,19 +1,31 @@
 class Gmime < Formula
   desc "MIME mail utilities"
   homepage "https://spruce.sourceforge.io/gmime/"
-  url "https://download.gnome.org/sources/gmime/3.2/gmime-3.2.5.tar.xz"
-  sha256 "fb7556501f85c3bf3e65fdd82697cbc4fa4b55dccd33ad14239ce0197e78ba59"
+  url "https://download.gnome.org/sources/gmime/3.2/gmime-3.2.7.tar.xz"
+  sha256 "2aea96647a468ba2160a64e17c6dc6afe674ed9ac86070624a3f584c10737d44"
+  license "LGPL-2.1"
 
   bottle do
-    sha256 "78965c37b7935797f7f28dc683e99a01262731916bcc36743b5da1a77c2c2af3" => :catalina
-    sha256 "de7743e5f141d1408446fbb5dcb6a91525e7ac5d703aca16fc128c2ba63afe11" => :mojave
-    sha256 "8bf88977ccf85ea5a2d5471f698c8a7954b07caca75c39ccbfa773976e4caccd" => :high_sierra
+    sha256                               arm64_monterey: "18050619c00d2e6b994b91472ed9567716f0d77ee64b200626ff6ab066e87aaa"
+    sha256                               arm64_big_sur:  "0c12167da5badd3447325e0770666c1e7f5e5e8945613e4c54c4e3e5ef1915fa"
+    sha256                               monterey:       "ea53d26dfed5e8441375732cc9c626436480ad9cfae885b9883b00e3b09b197b"
+    sha256                               big_sur:        "3714b2907a93c2495efb79c0cf870bdab5683c64c17696836b19e5b34108b852"
+    sha256                               catalina:       "877f2024cc0d97bc94f559ad992f87bdf6fdc23f9a1acc7b5bb13f0711b734c3"
+    sha256                               mojave:         "7a0bda5bca906bc62e3ab24fc39752e2858fce861ba759040fc864928ab18d96"
+    sha256                               high_sierra:    "0bb48841eae316695037bcd793673d518d0f2be20968a115a81c92824fb77ac0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "07bffed5c3be937ee007bd878ff92561ed7f17f841d5062eccc7a8900e416b42"
   end
 
   depends_on "gobject-introspection" => :build
   depends_on "pkg-config" => :build
   depends_on "glib"
   depends_on "gpgme"
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+  end
 
   def install
     args = %W[
@@ -62,8 +74,10 @@ class Gmime < Formula
       -lglib-2.0
       -lgmime-3.0
       -lgobject-2.0
-      -lintl
     ]
+    on_macos do
+      flags << "-lintl"
+    end
     system ENV.cc, "-o", "test", "test.c", *flags
     system "./test"
   end

@@ -1,29 +1,38 @@
 class WakatimeCli < Formula
   desc "Command-line interface to the WakaTime api"
   homepage "https://wakatime.com/"
-  url "https://files.pythonhosted.org/packages/04/db/9917533f8fd503f636f8c5655d9055f2fbef6f90a12a0210b92994f6f823/wakatime-10.4.1.tar.gz"
-  sha256 "8acef3ab83dbf9b5cc7592510b9dea1b75f20f4bdf60650329431b81e7f125a9"
+  url "https://github.com/wakatime/wakatime-cli.git",
+    tag:      "v1.37.0",
+    revision: "93c42c1e8a89ed2e95157edc475f2c6051e1e064"
+  license "BSD-3-Clause"
+  version_scheme 1
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "3167ac719d8b58384c8b81db49831e06d084b1455bec7198a8b423586742c650" => :catalina
-    sha256 "de1250de51e5a98e72a6719ab36ec7ff27d5cfe073bf2977e407dbede12fd92e" => :mojave
-    sha256 "21070f5a585ac2b80bcd97c28a6edfcf24a1225bc9fd92b8fbe02de904e66d44" => :high_sierra
-    sha256 "21070f5a585ac2b80bcd97c28a6edfcf24a1225bc9fd92b8fbe02de904e66d44" => :sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "4a55867bf9c038b16383794089ae6e0548f1d13fb4cd0a5cbc62287f6685af7b"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e7dec92343b38d1dd826e2a813385ef569fadfa77445c3842182e7b793182f88"
+    sha256 cellar: :any_skip_relocation, monterey:       "e0812cedfec4b9cbc609614eba541bb93dd3ee007317f534d5b6443b93f3cd7d"
+    sha256 cellar: :any_skip_relocation, big_sur:        "16fd7dd289d3078ab6d02aada8070781b45c6e9f8bb2b4ba8e3c4e1fd5f9892e"
+    sha256 cellar: :any_skip_relocation, catalina:       "550d137f692fb7fad7e1be54c7cdee19e15363215665414ccb6f737f49b7831c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8a0782cf408699d26b25235e29e895271be4dbcadd2ed2fed397c8ca4c3b9987"
   end
 
-  depends_on "python"
+  depends_on "go" => :build
 
   def install
-    xy = Language::Python.major_minor_version "python3"
-    ENV["PYTHONPATH"] = libexec/"lib/python#{xy}/site-packages"
-
-    system "python3", *Language::Python.setup_install_args(libexec)
-    bin.install Dir[libexec/"bin/*"]
-    bin.env_script_all_files(libexec/"bin", :PYTHONPATH => ENV["PYTHONPATH"])
+    arch = Hardware::CPU.intel? ? "amd64" : Hardware::CPU.arch.to_s
+    ldflags = %W[
+      -s -w
+      -X github.com/wakatime/wakatime-cli/pkg/version.Arch=#{arch}
+      -X github.com/wakatime/wakatime-cli/pkg/version.BuildDate=#{time.iso8601}
+      -X github.com/wakatime/wakatime-cli/pkg/version.Commit=#{Utils.git_head(length: 7)}
+      -X github.com/wakatime/wakatime-cli/pkg/version.OS=#{OS.kernel_name.downcase}
+      -X github.com/wakatime/wakatime-cli/pkg/version.Version=v#{version}
+    ].join(" ")
+    system "go", "build", *std_go_args(ldflags: ldflags)
   end
 
   test do
-    system "#{bin}/wakatime", "--help"
+    output = shell_output("#{bin}/wakatime-cli --help 2>&1")
+    assert_match "Command line interface used by all WakaTime text editor plugins", output
   end
 end

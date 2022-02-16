@@ -1,17 +1,27 @@
 class Squid < Formula
   desc "Advanced proxy caching server for HTTP, HTTPS, FTP, and Gopher"
   homepage "http://www.squid-cache.org/"
-  url "http://www.squid-cache.org/Versions/v4/squid-4.10.tar.xz"
-  sha256 "98f0100afd8a42ea5f6b81eb98b0e4b36d7a54beab1c73d2f1705ab49b025f1f"
+  url "http://www.squid-cache.org/Versions/v4/squid-4.17.tar.xz"
+  sha256 "cb928ac08c7c86b151b1c8f827abe1a84d83181a2a86e0d512286163e1e31418"
+  license "GPL-2.0-or-later"
+
+  livecheck do
+    url "http://www.squid-cache.org/Versions/v4/"
+    regex(/href=.*?squid[._-]v?(\d+(?:\.\d+)+)-RELEASENOTES\.html/i)
+  end
 
   bottle do
-    sha256 "b317cad793854ed6b0c3933ebec75194383d5c2b47e5f868027aaa9e9decb8f9" => :catalina
-    sha256 "116495c487377979f407c4c77a3b904cf06539deaf4fc86d02843d16e224a1d1" => :mojave
-    sha256 "a920686eea11ddb1d3f7fa2ac6a3cd12900e1f5eb181a3f920673e4076f60370" => :high_sierra
+    sha256 arm64_monterey: "4c922c513876e0eac5e5eea248e75f5d7b15ac934defbb29531b547211ca2ed5"
+    sha256 arm64_big_sur:  "ab7f9bcb273ce10621b219b3fa36306039a025d0a61745e061ff7135c2c5ce02"
+    sha256 monterey:       "6c60aef5ac07e2350e67ed8c190bb023152e3fab0ab676b95e77cb3b626f0c24"
+    sha256 big_sur:        "cd2c5c2dc8843d49adf1cf7b7c0b51567a0ad6d8293d3779006906695348e4ec"
+    sha256 catalina:       "4e4cb257f1a82777ba111d1c4a80de8398b7fa9e330cd2506f698e85a6057be9"
+    sha256 mojave:         "14b611332f6cb8001e15e875f02192b9ce2ca600a2a19f125cd51402032d102e"
+    sha256 x86_64_linux:   "ff99b1569d2fc90eea26ff2aadff55670eeacf2469fca3e713fb00ee6e77d10b"
   end
 
   head do
-    url "lp:squid", :using => :bzr
+    url "lp:squid", using: :bzr
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -49,30 +59,10 @@ class Squid < Formula
     system "make", "install"
   end
 
-  plist_options :manual => "squid"
-
-  def plist; <<~EOS
-    <?xml version="1.0" encoding="UTF-8"?>
-    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-    <plist version="1.0">
-    <dict>
-      <key>KeepAlive</key>
-      <true/>
-      <key>Label</key>
-      <string>#{plist_name}</string>
-      <key>ProgramArguments</key>
-      <array>
-        <string>#{opt_sbin}/squid</string>
-        <string>-N</string>
-        <string>-d 1</string>
-      </array>
-      <key>RunAtLoad</key>
-      <true/>
-      <key>WorkingDirectory</key>
-      <string>#{var}</string>
-    </dict>
-    </plist>
-  EOS
+  service do
+    run [opt_sbin/"squid", "-N", "-d 1"]
+    keep_alive true
+    working_dir var
   end
 
   test do

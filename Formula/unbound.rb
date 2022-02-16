@@ -1,18 +1,33 @@
 class Unbound < Formula
   desc "Validating, recursive, caching DNS resolver"
   homepage "https://www.unbound.net"
-  url "https://nlnetlabs.nl/downloads/unbound/unbound-1.9.6.tar.gz"
-  sha256 "1d98fc6ea99197a20b4a0e540e87022cf523085786e0fc26de6ebb2720f5aaf0"
-  head "https://github.com/NLnetLabs/unbound.git"
+  url "https://nlnetlabs.nl/downloads/unbound/unbound-1.15.0.tar.gz"
+  sha256 "a480dc6c8937447b98d161fe911ffc76cfaffa2da18788781314e81339f1126f"
+  license "BSD-3-Clause"
+  head "https://github.com/NLnetLabs/unbound.git", branch: "master"
+
+  # We check the GitHub repo tags instead of
+  # https://nlnetlabs.nl/downloads/unbound/ since the first-party site has a
+  # tendency to lead to an `execution expired` error.
+  livecheck do
+    url :head
+    regex(/^(?:release-)?v?(\d+(?:\.\d+)+)$/i)
+  end
 
   bottle do
-    sha256 "813d64c350df8065b82e0ec4a057d04839c75b7e34054e9d9aec71b5b13008b1" => :catalina
-    sha256 "f6ebf1d706a3c8b2b8d955757ead2fb7bcbc1219a7a64a1cb441d19c66ed1543" => :mojave
-    sha256 "b8249022a2846505980ea13fe2b9606fb83e84aade6178816cbc3af36e81ee2d" => :high_sierra
+    sha256 arm64_monterey: "915c6b513b276b18eb083839926aade01b36f78a8bf89039696e2ed4f31b571b"
+    sha256 arm64_big_sur:  "8602cf8aadc2e87948f14ed5f08d489b1759ac35ea832e1679df9f866d371465"
+    sha256 monterey:       "f817cb2fc47bb91d48680a309d07f75a777c566b8d52c81f22d4ed857e05856f"
+    sha256 big_sur:        "b00a31b7ef110af1c6efe3801cfe44faac0dd785298ba64c38fdbf6b4737259c"
+    sha256 catalina:       "3eb38a1d5c4da0d319dab0c20d7e3419506adf45a448ed4921147c0948fc0c58"
+    sha256 x86_64_linux:   "9f6128b97ce6f63f9197aa6010a6380afe31a8df9732e1c5d91a3036dc5c8f6d"
   end
 
   depends_on "libevent"
+  depends_on "libnghttp2"
   depends_on "openssl@1.1"
+
+  uses_from_macos "expat"
 
   def install
     args = %W[
@@ -22,15 +37,16 @@ class Unbound < Formula
       --enable-tfo-client
       --enable-tfo-server
       --with-libevent=#{Formula["libevent"].opt_prefix}
+      --with-libnghttp2=#{Formula["libnghttp2"].opt_prefix}
       --with-ssl=#{Formula["openssl@1.1"].opt_prefix}
     ]
 
-    args << "--with-libexpat=#{MacOS.sdk_path}/usr" if MacOS.sdk_path_if_needed
+    args << "--with-libexpat=#{MacOS.sdk_path}/usr" if OS.mac? && MacOS.sdk_path_if_needed
+    args << "--with-libexpat=#{Formula["expat"].opt_prefix}" if OS.linux?
     system "./configure", *args
 
     inreplace "doc/example.conf", 'username: "unbound"', 'username: "@@HOMEBREW-UNBOUND-USER@@"'
     system "make"
-    system "make", "test"
     system "make", "install"
   end
 
@@ -43,35 +59,10 @@ class Unbound < Formula
                     "username: \"#{ENV["USER"]}\""
   end
 
-  plist_options :startup => true
-
-  def plist; <<~EOS
-    <?xml version="1.0" encoding="UTF-8"?>
-    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-    <plist version="1.0">
-      <dict>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>KeepAlive</key>
-        <true/>
-        <key>RunAtLoad</key>
-        <true/>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{opt_sbin}/unbound</string>
-          <string>-d</string>
-          <string>-c</string>
-          <string>#{etc}/unbound/unbound.conf</string>
-        </array>
-        <key>UserName</key>
-        <string>root</string>
-        <key>StandardErrorPath</key>
-        <string>/dev/null</string>
-        <key>StandardOutPath</key>
-        <string>/dev/null</string>
-      </dict>
-    </plist>
-  EOS
+  plist_options startup: true
+  service do
+    run [opt_sbin/"unbound", "-d", "-c", etc/"unbound/unbound.conf"]
+    keep_alive true
   end
 
   test do

@@ -1,14 +1,23 @@
 class Leptonica < Formula
   desc "Image processing and image analysis library"
   homepage "http://www.leptonica.org/"
-  url "http://www.leptonica.org/source/leptonica-1.79.0.tar.gz"
-  sha256 "045966c9c5d60ebded314a9931007a56d9d2f7a6ac39cb5cc077c816f62300d8"
+  url "http://www.leptonica.org/source/leptonica-1.82.0.tar.gz"
+  sha256 "155302ee914668c27b6fe3ca9ff2da63b245f6d62f3061c8f27563774b8ae2d6"
+  license "BSD-2-Clause"
+
+  livecheck do
+    url "http://www.leptonica.org/download.html"
+    regex(/href=.*?leptonica[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    cellar :any
-    sha256 "2e53934abea2e776f9b532f4ea9d56c12e0bbbd83a54f56aa74de3393450dc11" => :catalina
-    sha256 "29985739b8eb8fdc9e927bfe95f5ed63c0f11a48f693b8af0210efce4b5d7742" => :mojave
-    sha256 "715a73dfeab21b60423385a51a400e815857742c4902b4d875083a50bc971354" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "f42b450f0dcc303c65e30de8ca6639bf5559c416072fe3f95b36bf5bfe0049d1"
+    sha256 cellar: :any,                 arm64_big_sur:  "f0d0cdb312ad51dc498f25765c7f4566e246eb7d74bd7ddc87b9a23f539f0bba"
+    sha256 cellar: :any,                 monterey:       "4eedc66fac0ac4e4f922c318b7de264d3b1af043a23e882867291c8808652468"
+    sha256 cellar: :any,                 big_sur:        "850aac10ef99d81dacea54d7b0f04df1a2058aac792b2649c4ecd91adcf1bbeb"
+    sha256 cellar: :any,                 catalina:       "a758e0b2eb14c548dd87946193185784cdb8d868e0aa17b2426660fad6ecdab2"
+    sha256 cellar: :any,                 mojave:         "8cef538c6bda97b6f8d71010259bced7ae5400f8a02e79e32cec1eee939b1463"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "118d4902ab8357da71a85d4461d460f1db63baed0d50bd717b145c3fd387f47d"
   end
 
   depends_on "pkg-config" => :build
@@ -37,7 +46,7 @@ class Leptonica < Formula
       #include <leptonica/allheaders.h>
 
       int main(int argc, char **argv) {
-          std::fprintf(stdout, "%d.%d.%d", LIBLEPT_MAJOR_VERSION, LIBLEPT_MINOR_VERSION, LIBLEPT_PATCH_VERSION);
+          fprintf(stdout, "%d.%d.%d", LIBLEPT_MAJOR_VERSION, LIBLEPT_MINOR_VERSION, LIBLEPT_PATCH_VERSION);
           return 0;
       }
     EOS

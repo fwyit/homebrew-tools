@@ -1,14 +1,18 @@
 class Fribidi < Formula
   desc "Implementation of the Unicode BiDi algorithm"
   homepage "https://github.com/fribidi/fribidi"
-  url "https://github.com/fribidi/fribidi/releases/download/v1.0.8/fribidi-1.0.8.tar.bz2"
-  sha256 "94c7b68d86ad2a9613b4dcffe7bbeb03523d63b5b37918bdf2e4ef34195c1e6c"
+  url "https://github.com/fribidi/fribidi/releases/download/v1.0.11/fribidi-1.0.11.tar.xz"
+  sha256 "30f93e9c63ee627d1a2cedcf59ac34d45bf30240982f99e44c6e015466b4e73d"
+  license all_of: ["GPL-2.0-or-later", "LGPL-2.1-or-later"]
 
   bottle do
-    cellar :any
-    sha256 "69403ab9b10c4e20ebbf4ace214fa89e2c055b9f7731871553e62a7065e31aaf" => :catalina
-    sha256 "b0084d49f6e420509f1f7d0ce0fb84be563302f1b907c12f1f8f53bda2b5ab15" => :mojave
-    sha256 "3b33566bbc8df22d57ee931b5de5fd59ab2d76058c26e20000deffaace90ffe2" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "e7c104d645d36d758001c381266aaa20ac40e0fc1591c02ae8d2310e8ca21109"
+    sha256 cellar: :any,                 arm64_big_sur:  "d80b767910f47f85b6fefc38a2742d520396f148b8290614b16328704f7c3bf4"
+    sha256 cellar: :any,                 monterey:       "28ddf160c24bea077a57dbd389a4e0ff44235fd04aa74335fcb043ab36b30fd4"
+    sha256 cellar: :any,                 big_sur:        "434c488a27dca39fa4fab0644cb9b2f495ea4f839eef63587d0de715a93a6f12"
+    sha256 cellar: :any,                 catalina:       "9ae1580fef75c9d665f5723200d7987b07674c452e2c236dae33e12a8cf16324"
+    sha256 cellar: :any,                 mojave:         "3ef3b5f32b31fad3fb8dc39a559b24abb04cf46c9b29303285eb160d1f4ed19c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f82a49f101fe666c5085302138ec5899e51c9346733149f4d872a9c468b7dcbe"
   end
 
   def install
@@ -25,6 +29,6 @@ class Fribidi < Formula
       a _lsimple _RteST_o th_oat
     EOS
 
-    assert_match /a simple TSet that/, shell_output("#{bin}/fribidi --charset=CapRTL --test test.input")
+    assert_match "a simple TSet that", shell_output("#{bin}/fribidi --charset=CapRTL --test test.input")
   end
 end

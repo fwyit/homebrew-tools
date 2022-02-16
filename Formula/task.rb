@@ -1,22 +1,36 @@
 class Task < Formula
   desc "Feature-rich console based todo list manager"
   homepage "https://taskwarrior.org/"
-  url "https://taskwarrior.org/download/task-2.5.1.tar.gz"
-  sha256 "d87bcee58106eb8a79b850e9abc153d98b79e00d50eade0d63917154984f2a15"
-  head "https://github.com/GothenburgBitFactory/taskwarrior.git", :branch => "2.6.0", :shallow => false
+  url "https://github.com/GothenburgBitFactory/taskwarrior/releases/download/v2.6.1/task-2.6.1.tar.gz"
+  sha256 "00aa6032b3d8379a5cfa29afb66d2b0703a69e3d1fea733d225d654dbcb0084f"
+  license "MIT"
+  head "https://github.com/GothenburgBitFactory/taskwarrior.git", branch: "develop"
+
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
 
   bottle do
-    sha256 "24c80011867aa34766864a4bbac071493fb45c93bd3e08b3e9979b3ba4780fa2" => :catalina
-    sha256 "bba98b6bdfb3f79f1434229d8ade4b0622119320353da0eb8fec39809d66947d" => :mojave
-    sha256 "6a651be957b736bef14633efedef011a81c49ee37178eae4d8ef863549d7c584" => :high_sierra
-    sha256 "d1cb582ab9ee211ec154690634b5988f8058ead31000c74d5cdfa949d319d0ed" => :sierra
-    sha256 "07aa2c19ae6d7a9a46b286bfc48fa970aa9a9e0237e034bbaab354dcfc4f6848" => :el_capitan
-    sha256 "113fc7ce057c51ea14021006a4106c25d29e361e4b70113e33fb7a83e57ee8d1" => :yosemite
-    sha256 "7888e42210edb6691ff57d056585536abd318d62b43a898bb98e286373519164" => :mavericks
+    sha256                               arm64_monterey: "7c498b1efc7a8923f3778488f3e480e8eda87bd7265f21b78283e59d94599072"
+    sha256                               arm64_big_sur:  "676b1d1ff1010a1ca30608b7092fb2b38abbea1c2a3241e6ff72d322b7fa48ce"
+    sha256                               monterey:       "4bbf3cb74b79dd440809515a474daf1bbb5bab743c1333bbefa16569bd42e454"
+    sha256                               big_sur:        "2d36d56302bd104719d07cf57c4af247ee72af3f1d817367c54a449a539ccb7d"
+    sha256                               catalina:       "8e9d4141d866acf6deb820c9c10b498eb40234f93e7100ffa4b9419257fab8f2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "50e2d1e85ec8408f214a12f5d7346d0e25e72e43ff4c6c17f6321fd6de6649f4"
   end
 
   depends_on "cmake" => :build
   depends_on "gnutls"
+
+  on_linux do
+    depends_on "gcc"
+    depends_on "linux-headers@4.4"
+    depends_on "readline"
+    depends_on "util-linux"
+  end
+
+  fails_with gcc: "5"
 
   def install
     system "cmake", ".", *std_cmake_args

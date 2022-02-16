@@ -1,27 +1,43 @@
 class Mpg123 < Formula
   desc "MP3 player for Linux and UNIX"
   homepage "https://www.mpg123.de/"
-  url "https://downloads.sourceforge.net/project/mpg123/mpg123/1.25.13/mpg123-1.25.13.tar.bz2"
-  sha256 "90306848359c793fd43b9906e52201df18775742dc3c81c06ab67a806509890a"
+  url "https://www.mpg123.de/download/mpg123-1.29.3.tar.bz2"
+  mirror "https://downloads.sourceforge.net/project/mpg123/mpg123/1.29.3/mpg123-1.29.3.tar.bz2"
+  sha256 "963885d8cc77262f28b77187c7d189e32195e64244de2530b798ddf32183e847"
+  license "LGPL-2.1-only"
+
+  livecheck do
+    url "https://www.mpg123.de/download/"
+    regex(/href=.*?mpg123[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    sha256 "231bff62192a6c109c7eeafd4deb90b967197f0656a5aa6ff23360540b2ea3e2" => :catalina
-    sha256 "853131e5b67225d5018b5574c9073dafee53d7fd8b326f164bad02b835ceee92" => :mojave
-    sha256 "fc7974c5e52d1c85e0345e359371fc7b1b2b102e2b2b4b4107a5a761ce06c5f4" => :high_sierra
+    rebuild 1
+    sha256 arm64_monterey: "10dcbf0526607d93ffb9d8a0723a0798d2474617ad3fd395807700019621635f"
+    sha256 arm64_big_sur:  "b6c673ec40d9baff23f7ac20b710d024bd9e4eaa5a72add9a90ba0a24f90998f"
+    sha256 monterey:       "c991eb5999e7e68b403c57d855b3dfc3e4932ccc512804339b1c984297b2bf88"
+    sha256 big_sur:        "70355cefcf35844d7bf4d7b23b16e1765924d08828acc672f0eb58fbea2bb455"
+    sha256 catalina:       "c26284810d5b37211e5a0963095ec22fb07ec3862bb01ba0e87d34cf48a618c8"
+    sha256 x86_64_linux:   "56ff29e1333532bc64fba795a3d0d1384ad51fb5fc88557a4db488aad7238d75"
   end
 
   def install
-    # Work around Xcode 11 clang bug
-    ENV.append_to_cflags "-fno-stack-check" if DevelopmentTools.clang_build_version >= 1010
-
     args = %W[
       --disable-debug
       --disable-dependency-tracking
       --prefix=#{prefix}
-      --with-default-audio=coreaudio
       --with-module-suffix=.so
-      --with-cpu=x86-64
+      --enable-static
     ]
+
+    args << "--with-default-audio=coreaudio" if OS.mac?
+
+    args << if Hardware::CPU.arm?
+      "--with-cpu=aarch64"
+    else
+      "--with-cpu=x86-64"
+    end
+
     system "./configure", *args
     system "make", "install"
   end

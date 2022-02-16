@@ -1,20 +1,33 @@
 class Sqlite < Formula
   desc "Command-line interface for SQLite"
-  homepage "https://sqlite.org/"
-  url "https://sqlite.org/2019/sqlite-autoconf-3300100.tar.gz"
-  version "3.30.1"
-  sha256 "8c5a50db089bd2a1b08dbc5b00d2027602ca7ff238ba7658fabca454d4298e60"
+  homepage "https://sqlite.org/index.html"
+  url "https://sqlite.org/2022/sqlite-autoconf-3370200.tar.gz"
+  version "3.37.2"
+  sha256 "4089a8d9b467537b3f246f217b84cd76e00b1d1a971fe5aca1e30e230e46b2d8"
+  license "blessing"
 
-  bottle do
-    cellar :any
-    sha256 "38c39121f7634ec563bb201b483f66cf567dfe61e02624ffb06f620f11158ab1" => :catalina
-    sha256 "5e6fef2d754e0e4009d502c40ad1846ac46937886b5f3fe89378cb838626d95e" => :mojave
-    sha256 "5331999b520ce7e257a0e263ef0a6d0a1d3d40ce9a1d5759a10e0e21dcd001be" => :high_sierra
+  livecheck do
+    url :homepage
+    regex(%r{href=.*?releaselog/v?(\d+(?:[._]\d+)+)\.html}i)
+    strategy :page_match do |page, regex|
+      page.scan(regex).map { |match| match&.first&.gsub("_", ".") }
+    end
   end
 
-  keg_only :provided_by_macos, "macOS provides an older sqlite3"
+  bottle do
+    sha256 cellar: :any,                 arm64_monterey: "debcf87141c39a5902b5142d64b1d91935677eb44f9838d60e52abc37a42a31e"
+    sha256 cellar: :any,                 arm64_big_sur:  "ee147de3d4d57624ffc26e230806cb2d8a99524f22401fbef8049e0b8b41c9b9"
+    sha256 cellar: :any,                 monterey:       "263146083f3cffb859312957fbb6b4dd8a11c87dafe22f3d3712d39566dfd026"
+    sha256 cellar: :any,                 big_sur:        "bf63198a72c33149f4d58a1004a189d176a0e135949e3d6e8ec96a7301de6caf"
+    sha256 cellar: :any,                 catalina:       "b3abf39f3b606267be4f712973e5fe5e693bc6aafcea3fe2d9a259482717a1c5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "23897fa4059f171f81d329fd9b52ad7d3c301e70f76619ac23e24e6673022f22"
+  end
+
+  keg_only :provided_by_macos
 
   depends_on "readline"
+
+  uses_from_macos "zlib"
 
   def install
     ENV.append "CPPFLAGS", "-DSQLITE_ENABLE_COLUMN_METADATA=1"

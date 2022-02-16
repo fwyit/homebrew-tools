@@ -1,37 +1,41 @@
 class Hugo < Formula
   desc "Configurable static site generator"
   homepage "https://gohugo.io/"
-  url "https://github.com/gohugoio/hugo/archive/v0.63.2.tar.gz"
-  sha256 "3b23b3738a2b2781aca8dbd4859782804fa1142d71d38c2144d04299f9030e6a"
-  head "https://github.com/gohugoio/hugo.git"
+  url "https://github.com/gohugoio/hugo/archive/v0.92.2.tar.gz"
+  sha256 "00d61205f426587dcfc4e2844a6f9fb451c825b828c00f0b46e3d0930c132751"
+  license "Apache-2.0"
+  head "https://github.com/gohugoio/hugo.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "ba91de450e154c48ff54839e750433ba9cd91117923682057b45dad267a77e87" => :catalina
-    sha256 "702b9233b7cc67624f658f5ec9c65eabb631ab445fbe6f6abfe5be5baac9c42c" => :mojave
-    sha256 "4cdd4f1c2951942149fb9daf6ac6f829a30f01dec9f147aadb72eb8d1553be8c" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "d1425fd4a49a791331c4e47561ab3737dc60fb0bcd71b6316a71a2d7ab6737b2"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1caa04e4b5b777ae7f1a362467e1eead2a5359f9dd41ef09265268b3565b4114"
+    sha256 cellar: :any_skip_relocation, monterey:       "07f3de3f17560694e7531198778aa5a57f491f9f030d4a911c789089a6ddb19d"
+    sha256 cellar: :any_skip_relocation, big_sur:        "5aa98eef5c5cbe13558cdde2269676b6c6e0999663af15b16ad401a126b4d643"
+    sha256 cellar: :any_skip_relocation, catalina:       "6373598920cb721c6a38d2919e149b272d9ceaf17dddda617db8bc2bab8e0ea8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5d3d072936fec0cd7038c9f10b590f0364aada7f6b43dfed84c7e900f2b341eb"
   end
 
   depends_on "go" => :build
 
   def install
-    ENV["GOPATH"] = HOMEBREW_CACHE/"go_cache"
-    (buildpath/"src/github.com/gohugoio/hugo").install buildpath.children
+    system "go", "build", *std_go_args(ldflags: "-s -w"), "-tags", "extended"
 
-    cd "src/github.com/gohugoio/hugo" do
-      system "go", "build", "-o", bin/"hugo", "-tags", "extended", "main.go"
+    # Install bash completion
+    output = Utils.safe_popen_read(bin/"hugo", "completion", "bash")
+    (bash_completion/"hugo").write output
 
-      # Build bash completion
-      system bin/"hugo", "gen", "autocomplete", "--completionfile=hugo.sh"
-      bash_completion.install "hugo.sh"
+    # Install zsh completion
+    output = Utils.safe_popen_read(bin/"hugo", "completion", "zsh")
+    (zsh_completion/"_hugo").write output
 
-      # Build man pages; target dir man/ is hardcoded :(
-      (Pathname.pwd/"man").mkpath
-      system bin/"hugo", "gen", "man"
-      man1.install Dir["man/*.1"]
+    # Install fish completion
+    output = Utils.safe_popen_read(bin/"hugo", "completion", "fish")
+    (fish_completion/"hugo.fish").write output
 
-      prefix.install_metafiles
-    end
+    # Build man pages; target dir man/ is hardcoded :(
+    (Pathname.pwd/"man").mkpath
+    system bin/"hugo", "gen", "man"
+    man1.install Dir["man/*.1"]
   end
 
   test do

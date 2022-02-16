@@ -2,48 +2,60 @@ class KubernetesCli < Formula
   desc "Kubernetes command-line interface"
   homepage "https://kubernetes.io/"
   url "https://github.com/kubernetes/kubernetes.git",
-      :tag      => "v1.17.2",
-      :revision => "59603c6e503c87169aea6106f57b9f242f64df89"
-  head "https://github.com/kubernetes/kubernetes.git"
+      tag:      "v1.23.3",
+      revision: "816c97ab8cff8a1c72eccca1026f7820e93e0d25"
+  license "Apache-2.0"
+  head "https://github.com/kubernetes/kubernetes.git", branch: "master"
 
-  bottle do
-    cellar :any_skip_relocation
-    sha256 "6d17df661d41decb333b2565d80339600b912c4912921e694ccd11c52e80cbbe" => :catalina
-    sha256 "c2984f440358d79b01deddf8a5c350ccfb39e286113830203edeacfd014cd626" => :mojave
-    sha256 "15b3b57388694a7c80f6902ce0e3fbdc5f575d015de6b8c441bc3a4c6b1bc369" => :high_sierra
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "5534ea2c6eb9aebc6c5412e5502a8d5100b30672d3e0f203cddb3d0d6558b8ad"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ff00e95508639baad685f8090e5f55ece4b404c5379c815f1218e1df8a5bcd11"
+    sha256 cellar: :any_skip_relocation, monterey:       "a36387677eacf9f5c1d0e321e305b54c8f11d04b4efcf6f1db97802b507ea3a1"
+    sha256 cellar: :any_skip_relocation, big_sur:        "fe5d07b4bd541bdb0aadfa628ffa6086f779674dfda8bf3e48fdeef24e55fc57"
+    sha256 cellar: :any_skip_relocation, catalina:       "3725fb170e0caa33a78cd2e6ada1f8482ae5bdf894c742007b0c3be71dc07508"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f61d19797f24b0bf90620f2a4bc10577e023d629d4958c18dc993bf4f94d8dba"
+  end
+
+  depends_on "bash" => :build
+  depends_on "coreutils" => :build
   depends_on "go" => :build
 
+  uses_from_macos "rsync" => :build
+
   def install
-    ENV["GOPATH"] = buildpath
-    dir = buildpath/"src/k8s.io/kubernetes"
-    dir.install buildpath.children - [buildpath/".brew_home"]
+    # Don't dirty the git tree
+    rm_rf ".brew_home"
 
-    cd dir do
-      # Race condition still exists in OS X Yosemite
-      # Filed issue: https://github.com/kubernetes/kubernetes/issues/34635
-      ENV.deparallelize { system "make", "generated_files" }
+    # Make binary
+    # Deparallelize to avoid race conditions in creating symlinks, creating an error like:
+    #   ln: failed to create symbolic link: File exists
+    # See https://github.com/kubernetes/kubernetes/issues/106165
+    ENV.deparallelize
+    ENV.prepend_path "PATH", Formula["coreutils"].libexec/"gnubin" # needs GNU date
+    system "make", "WHAT=cmd/kubectl"
+    bin.install "_output/bin/kubectl"
 
-      # Make binary
-      system "make", "kubectl"
-      bin.install "_output/local/bin/darwin/amd64/kubectl"
+    # Install bash completion
+    output = Utils.safe_popen_read(bin/"kubectl", "completion", "bash")
+    (bash_completion/"kubectl").write output
 
-      # Install bash completion
-      output = Utils.popen_read("#{bin}/kubectl completion bash")
-      (bash_completion/"kubectl").write output
+    # Install zsh completion
+    output = Utils.safe_popen_read(bin/"kubectl", "completion", "zsh")
+    (zsh_completion/"_kubectl").write output
 
-      # Install zsh completion
-      output = Utils.popen_read("#{bin}/kubectl completion zsh")
-      (zsh_completion/"_kubectl").write output
+    # Install fish completion
+    output = Utils.safe_popen_read(bin/"kubectl", "completion", "fish")
+    (fish_completion/"kubectl.fish").write output
 
-      prefix.install_metafiles
-
-      # Install man pages
-      # Leave this step for the end as this dirties the git tree
-      system "hack/generate-docs.sh"
-      man1.install Dir["docs/man/man1/*.1"]
-    end
+    # Install man pages
+    # Leave this step for the end as this dirties the git tree
+    system "hack/update-generated-docs.sh"
+    man1.install Dir["docs/man/man1/*.1"]
   end
 
   test do
@@ -53,9 +65,8 @@ class KubernetesCli < Formula
     version_output = shell_output("#{bin}/kubectl version --client 2>&1")
     assert_match "GitTreeState:\"clean\"", version_output
     if build.stable?
-      assert_match stable.instance_variable_get(:@resource)
-                         .instance_variable_get(:@specs)[:revision],
-                   version_output
+      revision = stable.specs[:revision]
+      assert_match revision.to_s, version_output
     end
   end
 end

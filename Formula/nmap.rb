@@ -1,21 +1,33 @@
 class Nmap < Formula
   desc "Port scanning utility for large networks"
   homepage "https://nmap.org/"
-  url "https://nmap.org/dist/nmap-7.80.tar.bz2"
-  sha256 "fcfa5a0e42099e12e4bf7a68ebe6fde05553383a682e816a7ec9256ab4773faa"
-  revision 1
+  url "https://nmap.org/dist/nmap-7.92.tar.bz2"
+  sha256 "a5479f2f8a6b0b2516767d2f7189c386c1dc858d997167d7ec5cfc798c7571a1"
+  license :cannot_represent
   head "https://svn.nmap.org/nmap/"
 
+  livecheck do
+    url "https://nmap.org/dist/"
+    regex(/href=.*?nmap[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
+
   bottle do
-    sha256 "ada1fae22e64234618a2df68d1ef43f4f0a186b80fb80ccce927c1679df9d66f" => :catalina
-    sha256 "bc12b9340cf3c23ac9f5a4eb6102884baf556b2347f46c3971600b91fb081125" => :mojave
-    sha256 "3cbc937428a7db08be8fa106b3a70ffad16f4a4d80808d2113490dd9ab60786c" => :high_sierra
-    sha256 "afa1fde2e44927ccb36447a0ce1dde08927ae67fd789afeb3883a95bd61edbc4" => :sierra
+    sha256 arm64_monterey: "fce671325c40cb243af6e19672b1a09221973211483c80641f0f698670d38b06"
+    sha256 arm64_big_sur:  "1f40f19d97c6f87564344793e9921535137f0d76020132cd33fff9a5b9e220da"
+    sha256 monterey:       "aed665169bd13d61b5b4cb04204548d6012cfe4bffe4ae40a44a86f756ffc64e"
+    sha256 big_sur:        "0e98a05d4ff5630ab1e70218930c06e598164fb5832fb76b3e4df3a4b6872ffa"
+    sha256 catalina:       "fe638eedb2063e9bdd8fb75679c6bceead8084456bba2a43819889c93158301d"
+    sha256 mojave:         "dba8ca74eccbb2eec127b82d6cb81478c131ba3d19f7851b82871775bb01e8b3"
+    sha256 x86_64_linux:   "5ceab0e20f0aba5059b7ba612876413c799d0a933dfb46c5bf078b432d01c7dd"
   end
 
   depends_on "openssl@1.1"
 
-  conflicts_with "ndiff", :because => "both install `ndiff` binaries"
+  uses_from_macos "bison" => :build
+  uses_from_macos "flex" => :build
+  uses_from_macos "zlib"
+
+  conflicts_with "ndiff", because: "both install `ndiff` binaries"
 
   def install
     ENV.deparallelize

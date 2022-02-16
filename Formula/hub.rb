@@ -1,18 +1,30 @@
 class Hub < Formula
   desc "Add GitHub support to git on the command-line"
   homepage "https://hub.github.com/"
-  url "https://github.com/github/hub/archive/v2.14.1.tar.gz"
-  sha256 "62c977a3691c3841c8cde4906673a314e76686b04d64cab92f3e01c3d778eb6f"
-  head "https://github.com/github/hub.git"
+  url "https://github.com/github/hub/archive/v2.14.2.tar.gz"
+  sha256 "e19e0fdfd1c69c401e1c24dd2d4ecf3fd9044aa4bd3f8d6fd942ed1b2b2ad21a"
+  license "MIT"
+  head "https://github.com/github/hub.git", branch: "master"
 
   bottle do
-    cellar :any_skip_relocation
-    sha256 "f092116bb42f4149b0a2abb25ee1752eec32923fe9bd0772607404b3da86e866" => :catalina
-    sha256 "671f391bbbd66507a7a9f871ee7222326eb54471478a2e5e1e6122cb58534425" => :mojave
-    sha256 "bb9269b14335df7a77cbe8072df072471c980b497c06f33b603744a60fc09d95" => :high_sierra
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "00602733d9a4c8049e34cb20a7c96dbd51f98a60e1cb5fbc9aec72663324ce89"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "19d761270350d4c4b6d5118d096dc7c012e7b58b43c0d81f9c6d8bded1888dd9"
+    sha256 cellar: :any_skip_relocation, monterey:       "d4c647211cc8a8e9aa9bedfaa4cb079a3a5fafea3f8378c7eaf5c50e2503cd0e"
+    sha256 cellar: :any_skip_relocation, big_sur:        "7c480f3de5f449a741f88718194c129d597f0fe0db8b2130c1ccf4daa9a8dfca"
+    sha256 cellar: :any_skip_relocation, catalina:       "fdf05855839a9d7ec6e7bee6796e3cb5fc473500cffc002366cf98c09a805b69"
+    sha256 cellar: :any_skip_relocation, mojave:         "bcbae9c683d76f3395665467ba0f0c00c60c12c84022f72faba4b8981724b563"
+    sha256 cellar: :any_skip_relocation, high_sierra:    "8800cda4532784bf764ea6116a06c81d8d90bb3d36d8ecf295e64f9dd647c4ad"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "213636e856404251ffd7897357ab91cc9519d3852e4b28cbb43575988d9bbc1b"
   end
 
   depends_on "go" => :build
+
+  uses_from_macos "groff" => :build
+  uses_from_macos "ruby" => :build
+
+  on_linux do
+    depends_on "util-linux"
+  end
 
   def install
     system "make", "install", "prefix=#{prefix}"

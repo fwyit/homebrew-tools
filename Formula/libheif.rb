@@ -1,22 +1,33 @@
 class Libheif < Formula
   desc "ISO/IEC 23008-12:2017 HEIF file format decoder and encoder"
   homepage "https://www.libde265.org/"
-  url "https://github.com/strukturag/libheif/releases/download/v1.6.2/libheif-1.6.2.tar.gz"
-  sha256 "bb229e855621deb374f61bee95c4642f60c2a2496bded35df3d3c42cc6d8eefc"
+  url "https://github.com/strukturag/libheif/releases/download/v1.12.0/libheif-1.12.0.tar.gz"
+  sha256 "e1ac2abb354fdc8ccdca71363ebad7503ad731c84022cf460837f0839e171718"
+  license "LGPL-3.0-only"
+  revision 1
 
   bottle do
-    cellar :any
-    sha256 "2d6e5b63b3a3dc455a33814b868a4785dff589a077bef534937972d8f4026f6e" => :catalina
-    sha256 "c5d12260701a92ad83a2e71dde7ae0d599e94848b0aafe8128d628d986c52d5a" => :mojave
-    sha256 "bd532f0e7f4071a90750655085ea5d19a29887b7aafed21a5325dceb3595dbc9" => :high_sierra
+    sha256 cellar: :any,                 arm64_monterey: "6285488bd07d49e996a1be0dfe7296051ade71cc2078ecbaa2243afd05afe560"
+    sha256 cellar: :any,                 arm64_big_sur:  "ccf8a9fecc4629a5ae7b7cdb2db8e86c74cf70ab345f960d513e45b57f646174"
+    sha256 cellar: :any,                 monterey:       "b2cadb8ecf0985f007340e54853ffa685f57fd4dba8cae4bae37499119a9fe04"
+    sha256 cellar: :any,                 big_sur:        "6a82cb078278ee9e6240b6c738308974ca3a4ef545c30016f8395967bb6f4959"
+    sha256 cellar: :any,                 catalina:       "9ed1d527c347fa67d346d5d638b1760177693819d167c7dc549ebabcaabc428c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6382a34a85ddc5cb1a8359de883c18867340294b2f662e84650b287f04324484"
   end
 
   depends_on "pkg-config" => :build
+  depends_on "aom"
   depends_on "jpeg"
   depends_on "libde265"
   depends_on "libpng"
   depends_on "shared-mime-info"
   depends_on "x265"
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+  end
 
   def install
     system "./configure", "--disable-dependency-tracking",
@@ -24,6 +35,7 @@ class Libheif < Formula
                           "--prefix=#{prefix}"
     system "make", "install"
     pkgshare.install "examples/example.heic"
+    pkgshare.install "examples/example.avif"
   end
 
   def post_install
@@ -33,10 +45,17 @@ class Libheif < Formula
   test do
     output = "File contains 2 images"
     example = pkgshare/"example.heic"
-    exout = testpath/"example.jpg"
+    exout = testpath/"exampleheic.jpg"
 
     assert_match output, shell_output("#{bin}/heif-convert #{example} #{exout}")
-    assert_predicate testpath/"example-1.jpg", :exist?
-    assert_predicate testpath/"example-2.jpg", :exist?
+    assert_predicate testpath/"exampleheic-1.jpg", :exist?
+    assert_predicate testpath/"exampleheic-2.jpg", :exist?
+
+    output = "File contains 1 images"
+    example = pkgshare/"example.avif"
+    exout = testpath/"exampleavif.jpg"
+
+    assert_match output, shell_output("#{bin}/heif-convert #{example} #{exout}")
+    assert_predicate testpath/"exampleavif.jpg", :exist?
   end
 end
