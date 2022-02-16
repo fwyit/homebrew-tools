@@ -18,7 +18,7 @@ homebrew安装完毕后这个仓库自动加载到`/usr/local/Homerew/Library/Ta
 
 brew时以github为基础构建的ruby脚本，所有仓库都集中再github上，所有此处演示的也是构建再github上的仓库。
 
-1.  仓库名称必须以`homebrew-anything`格式来命名，`homebrew-` 前缀是可选的，但是如果不加该前缀，必须使用整个url来安装，相当麻烦，所以务必加上此前缀。`anything`可以设置为任意自己喜欢的名字，如本项目的anything为`tools`。 
+1.  仓库名称必须以`homebrew-anything`格式来命名，`homebrew-` 前缀是可选的，但是如果不加该前缀，必须使用整个url来安装，相当麻烦，所以务必加上此前缀。`anything`可以设置为任意自己喜欢的名字，如本项目的anything为`tools`。
 2.  创建一个Formula文件夹，用来存放安装脚本，里边的文件名称就是你在brew install 时候需要下载的软件包名。
 
 ---
@@ -156,8 +156,15 @@ brew会自动创建一个sweather.rb 文件，文件内容大致如下(此处我
 ```
 
 > ### 备注：
-> 原谅可耻的参考[rangaofei](https://github.com/rangaofei/)童鞋[saka](https://github.com/rangaofei/homebrew-saka)库内容做了部分改编。  
-> 这个库主要用于下载一些自己常用但是官方不提供的下载地址的软件。  
+> 原谅可耻的参考[rangaofei](https://github.com/rangaofei/)童鞋[saka](https://github.com/rangaofei/homebrew-saka)库内容做了部分改编。
+> 这个库主要用于下载一些自己常用但是官方不提供的下载地址的软件。
 > 如果有其他需要更新的项目，欢迎随时提交issue....
 
 
+## 常见问题汇总
+
+1. 运行项目代码时出现 `Errno::ENOENT: No such file or directory - `
+  > 设置的临时变量需要以@@来表示，直接以@将出错。
+
+2. 运行`brew tap`时出现一大堆异常
+  > 此处主要是由于homebrew更新导致的，可以先将代码clone到本地，然后执行`brew tap xxx 本地路径`来强制获取本地代码库，而非使用github代码库。
