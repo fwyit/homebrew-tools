@@ -168,3 +168,7 @@ brew会自动创建一个sweather.rb 文件，文件内容大致如下(此处我
 
 2. 运行`brew tap`时出现一大堆异常
   > 此处主要是由于homebrew更新导致的，可以先将代码clone到本地，然后执行`brew tap xxx 本地路径`来强制获取本地代码库，而非使用github代码库。
+
+## 新增项目
+
+* [openresty](https://github.com/openresty/homebrew-brew)

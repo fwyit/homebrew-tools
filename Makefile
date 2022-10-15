@@ -7,3 +7,9 @@ formula:
 	done
 
 syn: formula
+
+openresty:
+	@test "$$(git remote -v | grep openresty)" || git remote add openresty git@github.com:openresty/homebrew-brew.git
+	git fetch --depth 1 openresty
+	git checkout refs/remotes/openresty/master Formula
+	grep openresty/brew  Formula/*.rb| grep depends_on | cut -d':' -f1 | sort | uniq | xargs sed -i '' 's@openresty/brew@fwyit/tools@g'
