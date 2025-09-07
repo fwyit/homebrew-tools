@@ -21,7 +21,7 @@ class Openresty < Formula
   option "with-slice", "Compile with ngx_http_slice_module"
 
   depends_on "libmaxminddb"
-  depends_on "openresty/brew/openresty-openssl3"
+  depends_on "fwyit/tools/openresty-openssl3"
   depends_on "pcre2"
   depends_on "postgresql" => :optional
 
@@ -32,8 +32,8 @@ class Openresty < Formula
 
   def install
     # Configure
-    cc_opt = "-I#{HOMEBREW_PREFIX}/include -I#{Formula["pcre2"].opt_include} -I#{Formula["openresty/brew/openresty-openssl3"].opt_include}"
-    ld_opt = "-L#{HOMEBREW_PREFIX}/lib -L#{Formula["pcre2"].opt_lib} -L#{Formula["openresty/brew/openresty-openssl3"].opt_lib}"
+    cc_opt = "-I#{HOMEBREW_PREFIX}/include -I#{Formula["pcre2"].opt_include} -I#{Formula["fwyit/tools/openresty-openssl3"].opt_include}"
+    ld_opt = "-L#{HOMEBREW_PREFIX}/lib -L#{Formula["pcre2"].opt_lib} -L#{Formula["fwyit/tools/openresty-openssl3"].opt_lib}"
 
     args = %W[
       -j#{Etc.nprocessors}

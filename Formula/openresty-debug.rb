@@ -14,7 +14,7 @@ class OpenrestyDebug < Formula
 
   depends_on "pcre"
   depends_on "postgresql" => :optional
-  depends_on "openresty/brew/openresty-openssl3"
+  depends_on "fwyit/tools/openresty-openssl3"
   depends_on "geoip"
 
   skip_clean "site"
