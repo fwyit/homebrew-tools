@@ -3,18 +3,26 @@ require 'etc'
 class Openresty < Formula
   desc "Scalable Web Platform by Extending NGINX with Lua"
   homepage "https://openresty.org"
-  VERSION = "1.19.9.1".freeze
-  revision 2
-  url "https://openresty.org/download/openresty-#{VERSION}.tar.gz"
-  sha256 "576ff4e546e3301ce474deef9345522b7ef3a9d172600c62057f182f3a68c1f6"
+  VERSION = "1.27.1.2".freeze
+  revision 1
+
+  stable do
+    url "https://openresty.org/download/openresty-#{VERSION}.tar.gz"
+    sha256 "74f076f7e364b2a99a6c5f9bb531c27610c78985abe956b442b192a2295f7548"
+
+    #patch do
+    #  url "https://raw.githubusercontent.com/openresty/openresty/refs/heads/master/patches/LuaJIT2-20241104.patch"
+    #  sha256 "5e1f56e32f481cd42c73612af7b6e4a06ee5a6f1f711553a76fb505ca2dfebeb"
+    #end
+  end
 
   option "with-postgresql", "Compile with ngx_http_postgres_module"
   option "with-iconv", "Compile with ngx_http_iconv_module"
   option "with-slice", "Compile with ngx_http_slice_module"
 
-  depends_on "geoip"
-  depends_on "fwyit/tools/openresty-openssl111"
-  depends_on "pcre"
+  depends_on "libmaxminddb"
+  depends_on "openresty/brew/openresty-openssl3"
+  depends_on "pcre2"
   depends_on "postgresql" => :optional
 
   skip_clean "site"
@@ -24,8 +32,8 @@ class Openresty < Formula
 
   def install
     # Configure
-    cc_opt = "-I#{HOMEBREW_PREFIX}/include -I#{Formula["pcre"].opt_include} -I#{Formula["fwyit/tools/openresty-openssl111"].opt_include}"
-    ld_opt = "-L#{HOMEBREW_PREFIX}/lib -L#{Formula["pcre"].opt_lib} -L#{Formula["fwyit/tools/openresty-openssl111"].opt_lib}"
+    cc_opt = "-I#{HOMEBREW_PREFIX}/include -I#{Formula["pcre2"].opt_include} -I#{Formula["openresty/brew/openresty-openssl3"].opt_include}"
+    ld_opt = "-L#{HOMEBREW_PREFIX}/lib -L#{Formula["pcre2"].opt_lib} -L#{Formula["openresty/brew/openresty-openssl3"].opt_lib}"
 
     args = %W[
       -j#{Etc.nprocessors}
@@ -63,6 +71,7 @@ class Openresty < Formula
       --with-http_mp4_module
       --with-http_gunzip_module
       --with-threads
+      --with-compat
       --with-luajit-xcflags=-DLUAJIT_NUMMODE=2\ -DLUAJIT_ENABLE_LUA52COMPAT\ -fno-stack-check
     ]
 
@@ -77,31 +86,11 @@ class Openresty < Formula
     system "make", "install"
   end
 
-  plist_options :manual => "openresty"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>KeepAlive</key>
-          <false/>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_prefix}/bin/openresty</string>
-            <string>-g</string>
-            <string>daemon off;</string>
-          </array>
-          <key>WorkingDirectory</key>
-          <string>#{HOMEBREW_PREFIX}</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_prefix/"bin/openresty", "-g", "daemon off;"]
+    working_dir HOMEBREW_PREFIX
+    keep_alive true
+    require_root true
   end
 
   def caveats
