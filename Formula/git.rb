@@ -23,7 +23,7 @@ class Git < Formula
     sha256 arm64_golden_gate: "8ac72c13f283a7b997604b479683bf418650d931bd2d9b8fe2f9059642b81bd9"
     sha256 arm64_tahoe:       "f932c1525a4d6aaf2d982c471f95992a1faafc8ff9e3f331395e6dd538cfa9ca"
     sha256 arm64_sequoia:     "8761edfe7a24efa75e6ded6aa98489a0d978eeca053d51c1f7b2b74bf365a587"
-    sha256 tahoe:             "170fc3082334ab7ad55ceb266aeb19bf683312b40f9ab96b3ec3cc6a0591229e"
+    sha256 tahoe:             "9e9b8ee7af83f36f63544a15aef68d623538ccfb02e0bd4a755e2988b6685721"
     sha256 arm64_linux:       "6df0cc15eccfad7112d82df088ed2abe60f068e6faa1bb5f1a23b5dea71b2d84"
     sha256 x86_64_linux:      "7b9b5082c7ffbf3a5084d1a11a1126ea646fcb9bddec2d24edc4d11efe9b60b9"
   end
