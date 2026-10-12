@@ -34,6 +34,10 @@ build:
 	@brew install --build-bottle fwyit/tools/$n
 	@cd bottle && fs=`ls $n*.json` && test -z "$$fs" && brew bottle --json fwyit/tools/$n && brew bottle --merge --keep-old --write $$fs
 
+check-update:
+	@brew outdated --formula
+cu: check-update
+
 openresty:
 	@test "$$(git remote -v | grep openresty)" || git remote add openresty git@github.com:openresty/homebrew-brew.git
 	git fetch --depth 1 openresty
