@@ -29,14 +29,20 @@ cp:
 	@test -e $(fn) || ( echo "未找到原始文件 $(fn)" && exit 3 )
 	@cp -f $(fn) Formula/
 
-build:
+build:	## 快速进行本地构建
 	@test -e $(fn) || ( echo "请先执行make cp" && exit 2 )
 	@brew install --build-bottle fwyit/tools/$n
 	@cd bottle && fs=`ls $n*.json` && test -z "$$fs" && brew bottle --json fwyit/tools/$n && brew bottle --merge --keep-old --write $$fs
 
-check-update:
+check-update:	## 检查待更新的服务
 	@brew outdated --formula
 cu: check-update
+fetch-update:	## 直接下载时待更新的服务
+	@make check-update | awk '{print $$1}' | xargs -n 1 brew fetch -s --debug
+fu: fetch-update
+deps-update:	## 获取待升级应用的依赖服务
+	@make check-update | awk '{print $$1}' | xargs -n 1 brew deps --missing -n --skip-recommended | tee /tmp/brew
+du: deps-update
 
 openresty:
 	@test "$$(git remote -v | grep openresty)" || git remote add openresty git@github.com:openresty/homebrew-brew.git
