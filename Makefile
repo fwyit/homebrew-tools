@@ -46,11 +46,13 @@ fu: fetch-update
 deps-update:	## 获取待升级应用的依赖服务
 	@make check-update | awk '{print $$1}' | xargs -n 1 brew deps --missing -n --skip-recommended | tee /tmp/brew
 du: deps-update
-un:
+un:	## 快速卸载某个应用
 	brew uninstall --ignore-dependencies $n
-us:
+us:	## 快速更新core项目
 	cd `brew --repo homebrew/core` && git pull origin main
 	date +%s > ${prev}
+up:	## 快速将bottle的内容上传到github release
+	cd bottle && gh release upload tahoe ${n}*tahoe*tar.gz
 
 openresty:
 	@test "$$(git remote -v | grep openresty)" || git remote add openresty git@github.com:openresty/homebrew-brew.git
