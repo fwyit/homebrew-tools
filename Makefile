@@ -46,6 +46,8 @@ deps-update:	## 获取待升级应用的依赖服务
 du: deps-update
 un:
 	brew uninstall --ignore-dependencies $n
+us:
+	cd `brew --repo homebrew/core` && git pull origin main
 
 openresty:
 	@test "$$(git remote -v | grep openresty)" || git remote add openresty git@github.com:openresty/homebrew-brew.git
