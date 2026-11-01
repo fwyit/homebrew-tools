@@ -38,7 +38,7 @@ build:	## 快速进行本地构建
 	@cd bottle && fs=`ls $n*.json 2>/dev/null`; \
 	test "$$fs" && echo "请核对是否需要再次生成bottle" || exit 0; \
 	d=$n.done ; test ! -e $$d && brew bottle --json fwyit/tools/$n && \
-	fs=ls $n*.json 2>/dev/null`; \
+	fs=`ls $n*.json 2>/dev/null`; \
 	brew bottle --merge --keep-old --write $$fs && date > $$d
 b: build
 
