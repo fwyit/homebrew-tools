@@ -35,7 +35,9 @@ cp:
 build:	## 快速进行本地构建
 	@test -e $(fn) || ( echo "请先执行make cp" && exit 2 )
 	@brew install --build-bottle fwyit/tools/$n
-	@cd bottle && fs=`ls $n*.json 2>/dev/null` ; test -z "$$fs" && brew bottle --json fwyit/tools/$n && brew bottle --merge --keep-old --write $$fs
+	@cd bottle && fs=`ls $n*.json 2>/dev/null`; \
+	d=$n.done ; test "$$fs" && test -e $$d && brew bottle --json fwyit/tools/$n && \
+	brew bottle --merge --keep-old --write $$fs && date > $$d
 b: build
 
 check-update:	## 检查待更新的服务
