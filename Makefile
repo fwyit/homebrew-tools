@@ -30,6 +30,7 @@ cp:
 	@test -e $(fn) || ( echo "未找到原始文件 $(fn)" && exit 3 )
 	@test -e $(prev) && test $$(($$(cat $(prev)) - $$(date +%s))) -gt $$((10*3600*24)) && make us || echo
 	@cp -f $(fn) Formula/
+	@git add Formula/$(fn) && git commit -m 'add 快速同步官网 ${n}'
 
 build:	## 快速进行本地构建
 	@test -e $(fn) || ( echo "请先执行make cp" && exit 2 )
