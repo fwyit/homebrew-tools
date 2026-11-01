@@ -1,5 +1,6 @@
 core_rel ?= ../../homebrew/homebrew-core/Formula
 core_loc ?= $(HOME)/code/pub/homebrew-core/Formula
+prev ?= bottle/prev
 
 ifeq ($(wildcard $(core_rel)),)
 core := $(core_loc)
@@ -27,12 +28,13 @@ syn: formula
 cp:
 	@test "$n" || ( echo "请输入需要复制的应用 n=xxx" && exit 2 )
 	@test -e $(fn) || ( echo "未找到原始文件 $(fn)" && exit 3 )
+	@test -e $(prev) && test $$(($$(cat $(prev)) - $$(date +%s))) -gt $$((10*3600*24)) && make us || echo
 	@cp -f $(fn) Formula/
 
 build:	## 快速进行本地构建
 	@test -e $(fn) || ( echo "请先执行make cp" && exit 2 )
 	@brew install --build-bottle fwyit/tools/$n
-	@cd bottle && fs=`ls $n*.json` && test -z "$$fs" && brew bottle --json fwyit/tools/$n && brew bottle --merge --keep-old --write $$fs
+	@cd bottle && fs=`ls $n*.json 2>/dev/null` ; test -z "$$fs" && brew bottle --json fwyit/tools/$n && brew bottle --merge --keep-old --write $$fs
 b: build
 
 check-update:	## 检查待更新的服务
@@ -48,6 +50,7 @@ un:
 	brew uninstall --ignore-dependencies $n
 us:
 	cd `brew --repo homebrew/core` && git pull origin main
+	date +%s > ${prev}
 
 openresty:
 	@test "$$(git remote -v | grep openresty)" || git remote add openresty git@github.com:openresty/homebrew-brew.git
