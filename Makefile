@@ -33,7 +33,7 @@ cp:
 	@git add Formula/$(n)* && git commit -m 'add 快速同步官网 ${n}'
 
 build:	## 快速进行本地构建
-	@test -e $(fn) || ( echo "请先执行make cp" && exit 2 )
+	@test -e Formula/$(n).rb || ( echo "请先执行make cp" && exit 2 )
 	@brew install --build-bottle fwyit/tools/$n
 	@cd bottle && fs=`ls $n*.json 2>/dev/null`; \
 	test "$$fs" && echo "请核对是否需要再次生成bottle" || exit 0; \
