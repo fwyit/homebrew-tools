@@ -30,7 +30,7 @@ cp:
 	@test -e $(fn) || ( echo "未找到原始文件 $(fn)" && exit 3 )
 	@test -e $(prev) && test $$(($$(cat $(prev)) - $$(date +%s))) -gt $$((10*3600*24)) && make us || echo
 	@cp -f $(fn) Formula/ || brew cat $n > Formula/$n.rb
-	@git add Formula/$(n)* && git commit -m 'add 快速同步官网 ${n}'
+	@git add Formula/$(n)* && git commit -m 'add 快速同步官网 ${n}' || echo "无需更新仓库内文件"
 
 build:	## 快速进行本地构建
 	@test -e Formula/$(n).rb || ( echo "请先执行make cp" && exit 2 )
@@ -57,7 +57,7 @@ us:	## 快速更新core项目
 	cd `brew --repo homebrew/core` && git pull origin main
 	date +%s > ${prev}
 up:	## 快速将bottle的内容上传到github release
-	cd bottle && gh release upload tahoe ${n}*tahoe*tar.gz
+	cd bottle && n=`ls $n*tahoe*.tar.gz` && mv $$n $${n/--/-} && gh release upload tahoe $n-*tahoe*.tar.gz
 
 openresty:
 	@test "$$(git remote -v | grep openresty)" || git remote add openresty git@github.com:openresty/homebrew-brew.git
