@@ -12,7 +12,8 @@ class CaCertificates < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "8589f4e61b3afcc5ea375aab11af1c891ec4c94421c699c2a5a4765078de4443"
+    sha256 cellar: :any_skip_relocation, tahoe: "d11ad239c14e8d1aa1719a23dbfa76335102f64df8229049f039710e9b9d01d7"
+    sha256 cellar: :any_skip_relocation, all:   "8589f4e61b3afcc5ea375aab11af1c891ec4c94421c699c2a5a4765078de4443"
   end
 
   deny_network_access!
