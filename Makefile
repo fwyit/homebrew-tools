@@ -37,7 +37,7 @@ build:	## 快速进行本地构建
 	@brew install --build-bottle fwyit/tools/$n
 	@cd bottle && fs=`ls $n*.json 2>/dev/null`; \
 	test "$$fs" && echo "请核对是否需要再次生成bottle" && exit 0 || echo ; \
-	d=$n.done ; test ! -e $$d && brew bottle --json fwyit/tools/$n && \
+	d=$n.done ; test ! -e $$d && brew bottle --json fwyit/tools/$n --keep-old && \
 	fs=`ls $n*.json 2>/dev/null`; \
 	brew bottle --merge --keep-old --write $$fs && date > $$d
 b: build
