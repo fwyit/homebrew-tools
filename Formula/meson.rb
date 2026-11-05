@@ -9,7 +9,8 @@ class Meson < Formula
 
   bottle do
     rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "a6fd325ff232fff1223f98507bfd98c01a99ba570d6bc8864248d437620523f3"
+    sha256 cellar: :any_skip_relocation, tahoe: "543ecd49c87681e7ed3d00f86cbe921c2a64ee13f720203d7044872dcd082479"
+    sha256 cellar: :any_skip_relocation, all:   "a6fd325ff232fff1223f98507bfd98c01a99ba570d6bc8864248d437620523f3"
   end
 
   depends_on "ninja"
