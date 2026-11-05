@@ -27,7 +27,7 @@ syn: formula
 
 cp:
 	@test "$n" || ( echo "请输入需要复制的应用 n=xxx" && exit 2 )
-	@test -e $(fn) || ( echo "未找到原始文件 $(fn)" && exit 3 )
+	#@test -e $(fn) || ( echo "未找到原始文件 $(fn)" && exit 3 )
 	@test -e $(prev) && test $$(($$(cat $(prev)) - $$(date +%s))) -gt $$((10*3600*24)) && make us || echo
 	@cp -f $(fn) Formula/ || brew cat $n > Formula/$n.rb
 	@git add Formula/$(n)* && git commit -m 'add 快速同步官网 ${n}' || echo "无需更新仓库内文件"
