@@ -12,10 +12,11 @@ class TerminalNotifier < Formula
     sha256 cellar: :any_skip_relocation, arm64_tahoe:       "124d27b95cd3911a6d417c0f55a065ca9613a34f4ed4d53263b4bbdca2007122"
     sha256 cellar: :any_skip_relocation, arm64_sequoia:     "0fbb85742dd622ef9ff8b1ae2f42a7c8b1687a732379f63901ae27d9af26ff9b"
     sha256 cellar: :any_skip_relocation, arm64_sonoma:      "70f5c03ad1d542ae13cbbb9d7fa589c56601c2eb121f25cc726ba4a3f8442bc5"
+    sha256 cellar: :any_skip_relocation, tahoe:             "bb91a48afd630fa30250490cd42f65fd318ed35250598636906d48c2e2c63cc4"
   end
 
   depends_on xcode: :build
-  depends_on :macos
+  # depends_on :macos
 
   def install
     xcodebuild "-arch", Hardware::CPU.arch,
