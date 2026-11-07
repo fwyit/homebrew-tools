@@ -7,7 +7,8 @@ class Certifi < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "6a1ad67a87b9d987dc2e62ca1bb553345e003870a4664f23063f9cb4a38b165a"
+    sha256 cellar: :any_skip_relocation, tahoe: "eba8e6c6e24ad5f4b4a5769a4b2ac350311820dc94aee630eb30bf24b8918c79"
+    sha256 cellar: :any_skip_relocation, all:   "6a1ad67a87b9d987dc2e62ca1bb553345e003870a4664f23063f9cb4a38b165a"
   end
 
   depends_on "python-setuptools" => :build
