@@ -13,6 +13,7 @@ class Libngtcp2 < Formula
     sha256 cellar: :any, arm64_golden_gate: "540de48789ba48e74fd5d802db03bd3cba790336251d073396147f4079f31416"
     sha256 cellar: :any, arm64_tahoe:       "6f3de07772fcd0b2c34b03276526de3c9ede59dbde95f6a5fafd7c5f9c584173"
     sha256 cellar: :any, arm64_sequoia:     "9213450a97f4ddc6a0dbcdf1b2280b93efd0f02818d953b6935995d12a885ea3"
+    sha256 cellar: :any, tahoe:             "b49a03e5fbd71ed5c1360d9aeda34db0a6959ee4579706d3fae3f2816ea2067e"
     sha256 cellar: :any, arm64_linux:       "dba9d8ecbe77ccab7a7ed61dbfe900c7a0103afead91f3ba5a646f22cac4b15f"
     sha256 cellar: :any, x86_64_linux:      "b277f7073873058bf547f6e6b75ac3a1f4dbea6a0a30704710b89a7e70c942a8"
   end
