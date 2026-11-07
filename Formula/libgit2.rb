@@ -1,9 +1,11 @@
 class Libgit2 < Formula
   desc "C library of Git core methods that is re-entrant and linkable"
-  homepage "https://libgit2.github.com/"
-  url "https://github.com/libgit2/libgit2/archive/v1.3.0.tar.gz"
-  sha256 "192eeff84596ff09efb6b01835a066f2df7cd7985e0991c79595688e6b36444e"
-  license "GPL-2.0-only"
+  homepage "https://libgit2.org/"
+  url "https://github.com/libgit2/libgit2/archive/refs/tags/v1.9.7.tar.gz"
+  sha256 "1a4fbe7589e814777ae76b64734ad80f4ecad22cd33a22682a2aaea4ae5375e7"
+  license "GPL-2.0-only" => { with: "GCC-exception-2.0" }
+  revision 2
+  compatibility_version 1
   head "https://github.com/libgit2/libgit2.git", branch: "main"
 
   livecheck do
@@ -12,46 +14,62 @@ class Libgit2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "d648370b7a2b9713e9ca4b151e3204de78b3acc4f5841c8e9152002447402d48"
-    sha256 cellar: :any,                 arm64_big_sur:  "0413adf01a5a5fe0f63933ec7850c5a638cf1e67dd5a371da6b8c63a154c2a2a"
-    sha256 cellar: :any,                 monterey:       "426cbbe5464b73d9255f1ae3cccba1a241245b81203ac28e36b428bbd6bb32b8"
-    sha256 cellar: :any,                 big_sur:        "12bd50433d0bcf5d85b10c609e78c28563c86c9022ffd420cd0a892875b1fa06"
-    sha256 cellar: :any,                 catalina:       "9e9053beefb103cca13bd58bb701c8894c0b11be7235570a9836a18499a4f054"
-    sha256 cellar: :any,                 mojave:         "f954042fedcf3c8b71b0a28395fad9c0af34d769155c9427208d71f5b5cf98b6"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9df3234f89f7c5bbb15dfa10d0df247f3618fbd005e434397d27385b8d7536ca"
+    sha256 cellar: :any, arm64_golden_gate: "8087d62ae8c4802644b8f3b4057cb0df0aeb087a2393dc707f94a2d8a1ca4e12"
+    sha256 cellar: :any, arm64_tahoe:       "61cc4d0d03f5a400cede72fb57609df07909725a3f8cb6a1f75b2edaec3ddf85"
+    sha256 cellar: :any, arm64_sequoia:     "302c14f39d0308fc5efa27a6cbec77ad03a1c763419c05d08ce334a908720759"
+    sha256 cellar: :any, arm64_linux:       "250ca463b1e1b58ec5d6eb55d29b3bcbbda24b9707eee147e73fffe712ead625"
+    sha256 cellar: :any, x86_64_linux:      "ee9a37ee37860ddfeabf3f46dce5423930df4756a64c4430a448e88e7b9107e8"
   end
 
   depends_on "cmake" => :build
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libssh2"
+  depends_on "llhttp"
+  depends_on "openssl@4"
+
+  on_linux do
+    depends_on "pcre2" # Uses regcomp_l on macOS which needs xlocale.h
+    depends_on "zlib-ng-compat"
+  end
+
+  deny_network_access!
 
   def install
-    args = std_cmake_args
-    args << "-DBUILD_EXAMPLES=YES"
-    args << "-DBUILD_CLAR=NO" # Don't build tests.
+    # Remove bundled libraries
+    rm_r(Dir["deps/*"] - ["deps/ntlmclient", "deps/xdiff"])
 
-    mkdir "build" do
-      system "cmake", "..", *args
-      system "make", "install"
-      cd "examples" do
-        (pkgshare/"examples").install "lg2"
-      end
-      system "make", "clean"
-      system "cmake", "..", "-DBUILD_SHARED_LIBS=OFF", *args
-      system "make"
-      lib.install "libgit2.a"
-    end
+    args = %w[
+      -DBUILD_EXAMPLES=OFF
+      -DBUILD_TESTS=OFF
+      -DUSE_BUNDLED_ZLIB=OFF
+      -DUSE_HTTPS=OpenSSL
+      -DUSE_HTTP_PARSER=llhttp
+      -DUSE_SSH=ON
+    ]
+    # TODO: Switch to USE_REGEX in 1.10
+    args << "-DREGEX_BACKEND=pcre2" if OS.linux?
+
+    system "cmake", "-S", ".", "-B", "build", "-DBUILD_SHARED_LIBS=ON", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
+
+    system "cmake", "-S", ".", "-B", "build-static", "-DBUILD_SHARED_LIBS=OFF", *args, *std_cmake_args
+    system "cmake", "--build", "build-static"
+    lib.install "build-static/libgit2.a"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <git2.h>
+      #include <assert.h>
 
       int main(int argc, char *argv[]) {
         int options = git_libgit2_features();
+        assert(options & GIT_FEATURE_HTTPS);
+        assert(options & GIT_FEATURE_SSH);
         return 0;
       }
-    EOS
+    C
     libssh2 = Formula["libssh2"]
     flags = %W[
       -I#{include}
