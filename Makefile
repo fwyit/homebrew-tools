@@ -13,3 +13,6 @@ openresty:
 	git fetch --depth 1 openresty
 	git checkout refs/remotes/openresty/master Formula
 	grep openresty/brew  Formula/*.rb| grep depends_on | cut -d':' -f1 | sort | uniq | xargs sed -i '' 's@openresty/brew@fwyit/tools@g'
+
+
+prd: un cp build
