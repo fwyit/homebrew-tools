@@ -16,7 +16,7 @@ class TerminalNotifier < Formula
   end
 
   depends_on xcode: :build
-  # depends_on :macos
+  depends_on :macos
 
   def install
     xcodebuild "-arch", Hardware::CPU.arch,
