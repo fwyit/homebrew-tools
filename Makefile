@@ -67,3 +67,7 @@ openresty:
 
 
 prd: un cp build
+
+qd:	# 快速下载信息
+	@n=https://github.com/fwyit/homebrew-tools/releases/download/tahoe ; export HOMEBREW_BOTTLE_DOMAIN=$$n HOMEBREW_ARTIFACT_DOMAIN=$$n; \
+	brew install fwyit/tools/$n
