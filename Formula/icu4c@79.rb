@@ -21,6 +21,7 @@ class Icu4cAT79 < Formula
     sha256 cellar: :any, arm64_golden_gate: "8499235357ff52424e3fcc647a6ce57050af9f10904554df90319e6a088f665d"
     sha256 cellar: :any, arm64_tahoe:       "4424c58d257d07b28086814a575baa9e462560460fdea5455581d99062896cec"
     sha256 cellar: :any, arm64_sequoia:     "7d05da26db392a008abe89706adcf8b089e08d3431535ac95a5c984ceda88153"
+    sha256 cellar: :any, tahoe:             "276cfca7f83849e7fce1f85de5814007ca845b95315ddfc8e196a99e11e498a9"
     sha256 cellar: :any, arm64_linux:       "ebe1d075451ec91197686ccdefa5ca08210aa67cdbe1a9c967a081a34937fe21"
     sha256 cellar: :any, x86_64_linux:      "8e06c733d9e465f5151d7eb76a3e8b460c8ccfa8020da3ce2b8b5e2f45435c43"
   end
