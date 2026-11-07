@@ -30,6 +30,7 @@ cp:
 	#@test -e $(fn) || ( echo "未找到原始文件 $(fn)" && exit 3 )
 	@test -e $(prev) && test $$(($$(cat $(prev)) - $$(date +%s))) -gt $$((10*3600*24)) && make us || echo
 	@cp -f $(fn) Formula/ || brew cat $n > Formula/$n.rb
+	@n=Formula/$n.rb ; test "$$(cat $$n)" || ( echo "本次未获取到 $n 内容，请核查应用的准确性" && rm -f $$n && exit 4 )
 	@git add Formula/$(n)* && git commit -m 'add 快速同步官网 ${n}' || echo "无需更新仓库内文件"
 
 build:	## 快速进行本地构建
