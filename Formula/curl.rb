@@ -19,6 +19,7 @@ class Curl < Formula
     sha256 cellar: :any, arm64_golden_gate: "16b951fa8ecede2c254441c26e34814fed37c1e97382dad3016012aa2cbf20ac"
     sha256 cellar: :any, arm64_tahoe:       "44771918de230a1767855f3e6623b280c4e1b238a431e997bec8fc53b8bd8f74"
     sha256 cellar: :any, arm64_sequoia:     "d0245613b94f81fbb069090f4310a6a0c71830a3bf6b3f14ebef30c6ae49b957"
+    sha256 cellar: :any, tahoe:             "a213a8dd8d326c83d47391cfc042e8428bd988ef33a0274a580fc358ff420c8b"
     sha256 cellar: :any, arm64_linux:       "773a9a7afd3a2953b132dee517f9dc56a7bf339a9bd3eda72745f013c72a9200"
     sha256 cellar: :any, x86_64_linux:      "2c606f6fe3a8937a21925ada646e72d85f5c4ccc0a7a93c7ab3ae7536886db4a"
   end
