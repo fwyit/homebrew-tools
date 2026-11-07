@@ -13,11 +13,13 @@ class Npth < Formula
   end
 
   bottle do
+    root_url "https://github.com/fwyit/homebrew-tools/releases/download/tahoe"
     sha256 cellar: :any,                 arm64_golden_gate: "d05077b20487633f09e465891ed781b32d251c95968c410354f921bcef875146"
     sha256 cellar: :any,                 arm64_tahoe:       "7dc8a83801469950381677b61404e103e5fd8fb22bc6b4e0f68db292d5801e3a"
     sha256 cellar: :any,                 arm64_sequoia:     "7836af0109be87ab2b8155b533cd33508eb3b738190031c8ca2e2b94df6f5c2b"
     sha256 cellar: :any,                 arm64_sonoma:      "fe1fe3f063148f11e6ef6182846b1a23177faca872902248665bd23b1c6d6a11"
     sha256 cellar: :any,                 arm64_ventura:     "7178f348dbdf184206e70c7aa62711c53c900f888bdffd1391ad709497ec456d"
+    sha256 cellar: :any,                 tahoe:             "3e9a404bd5c53921cae1732500f31df742bf19e7d707c587475e314dc9ef63ad"
     sha256 cellar: :any,                 sonoma:            "6532f31787befd9082aa4902e75bf6a0ba26b4423029b7b9c1f1117ff0d0df7d"
     sha256 cellar: :any,                 ventura:           "669a65d8a32cfd4d30a79d606702c982b474586ad23283d7ad3e1f6e40712076"
     sha256 cellar: :any_skip_relocation, arm64_linux:       "ae6de43d79405ea955e4f8ea018bd0660da87bb0a40c39a1f9b7759915316006"
