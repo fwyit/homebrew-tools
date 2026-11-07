@@ -25,7 +25,10 @@ formula:
 
 syn: formula
 
-cp:
+patch: ## 快速拷贝patch信息
+	@p=$(core_rel)/../Patches/$n ; test -d $$p && cp -rf $$p Patches/ && git add Patches/$n && git status || echo "==> $n: 无需打对应path"
+
+cp:	## 快速更新应用版本
 	@test "$n" || ( echo "请输入需要复制的应用 n=xxx" && exit 2 )
 	#@test -e $(fn) || ( echo "未找到原始文件 $(fn)" && exit 3 )
 	@test -e $(prev) && test $$(($$(cat $(prev)) - $$(date +%s))) -gt $$((10*3600*24)) && make us || echo
@@ -66,14 +69,10 @@ openresty:
 	git checkout refs/remotes/openresty/master Formula
 	grep openresty/brew  Formula/*.rb| grep depends_on | cut -d':' -f1 | sort | uniq | xargs sed -i '' 's@openresty/brew@fwyit/tools@g'
 
-
-prd: un cp build
+prd: patch un cp build
 pa:	# 快速批量构建某个应用及其依赖
 	@for n in `brew deps --missing --include-build -n $n` $n; do echo "==== 准备更新 $$n"; $(MAKE) prd n=$$n || (echo "!!! 安装依赖 $$n 失败，任意键继续" && read); done
 
 qd:	# 快速下载信息
 	@n=https://github.com/fwyit/homebrew-tools/releases/download/tahoe ; export HOMEBREW_BOTTLE_DOMAIN=$$n HOMEBREW_ARTIFACT_DOMAIN=$$n; \
 	brew install fwyit/tools/$n
-
-patch: ## 快速拷贝patch信息
-	@p=$(core_rel)/../Patches/$n ; test -d $$p && cp -rf $$p Patches/ && git add Patches/$n && git status 
