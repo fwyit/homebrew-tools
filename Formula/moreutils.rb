@@ -19,6 +19,7 @@ class Moreutils < Formula
     sha256 cellar: :any_skip_relocation, arm64_golden_gate: "6a7ff4ef8702f3fe3e31a148f87b1a5051804d9b971069fda621668cfd9b397d"
     sha256 cellar: :any_skip_relocation, arm64_tahoe:       "4791896aa6bbf8d7cc1a59c11210c687960fb2e6a30980bcf39fe5963de44434"
     sha256 cellar: :any_skip_relocation, arm64_sequoia:     "a381a17a5d3a4db5e311c622d78cf23dbe823b3ffe14fe33eba0269c3eb274bf"
+    sha256 cellar: :any_skip_relocation, tahoe:             "cfd0fac92214492b3190dcfb52ae8698e3d2dd5634c1b9d525385722d723bdd8"
     sha256 cellar: :any,                 arm64_linux:       "a62fe5d94e08dedbb81b2fb11dfd1f2d6af480405da084232dada7f18123e363"
     sha256 cellar: :any,                 x86_64_linux:      "9e091816d85d311cbee7a188d3ce74a8705d163af9bb80e76981352599002ef8"
   end
