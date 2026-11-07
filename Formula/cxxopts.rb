@@ -9,7 +9,8 @@ class Cxxopts < Formula
 
   bottle do
     rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "5c90eb7984473c65039f6dce14c4d9df760f5545777d8901dd5725a87f72a43c"
+    sha256 cellar: :any_skip_relocation, tahoe: "875bc1b2a1a0d3c34c29589f60221412d0fffae1a64467a187e2ebf21937331d"
+    sha256 cellar: :any_skip_relocation, all:   "5c90eb7984473c65039f6dce14c4d9df760f5545777d8901dd5725a87f72a43c"
   end
 
   depends_on "cmake" => :build
