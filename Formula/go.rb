@@ -1,78 +1,97 @@
 class Go < Formula
   desc "Open source programming language to build simple/reliable/efficient software"
   homepage "https://go.dev/"
-  url "https://go.dev/dl/go1.17.6.src.tar.gz"
-  mirror "https://fossies.org/linux/misc/go1.17.6.src.tar.gz"
-  sha256 "4dc1bbf3ff61f0c1ff2b19355e6d88151a70126268a47c761477686ef94748c8"
+  url "https://go.dev/dl/go1.27.3.src.tar.gz"
+  mirror "https://fossies.org/linux/misc/go1.27.3.src.tar.gz"
+  sha256 "6e7749035cf360f06b2575d162ea79df9fda8ef671889e5c375f8e50777f26bb"
   license "BSD-3-Clause"
+  compatibility_version 13
   head "https://go.googlesource.com/go.git", branch: "master"
 
   livecheck do
-    url "https://go.dev/dl/"
-    regex(/href=.*?go[._-]?v?(\d+(?:\.\d+)+)[._-]src\.t/i)
+    url "https://go.dev/dl/?mode=json"
+    regex(/^go[._-]?v?(\d+(?:\.\d+)+)[._-]src\.t.+$/i)
+    strategy :json do |json, regex|
+      json.map do |release|
+        next if release["stable"] != true
+        next if release["files"].none? { |file| file["filename"].match?(regex) }
+
+        release["version"][/(\d+(?:\.\d+)+)/, 1]
+      end
+    end
   end
 
   bottle do
-    sha256 arm64_monterey: "b7397f2bb5f35e87677581fab0441698614ed74d2faf10fc9d82a157945cd4b6"
-    sha256 arm64_big_sur:  "498f7212b386b369965b101a795320eed1f6327d8b51a4e5d6158c4b527c2df1"
-    sha256 monterey:       "c81555a115fbd99ab1c74e9b3e1d056864c31a4274803381230984f4a70fdf63"
-    sha256 big_sur:        "ee3c6b380b93482e56620f7962bde13c2492131b15cdd37ce925dc1d6db9efcf"
-    sha256 catalina:       "f7a522d413b3b5fc47305a3851e0148a63b2786f22796399feb6788af92adb14"
-    sha256 x86_64_linux:   "4b4c9d51934b2c75fa32dcfb239363673a2bb471388f53976a98151489e00209"
+    sha256 cellar: :any_skip_relocation, arm64_golden_gate: "c7bf84a6f727873581b3e1b5f79c1254cd5856f1241534e2f6943a8acc193e6e"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:       "c7bf84a6f727873581b3e1b5f79c1254cd5856f1241534e2f6943a8acc193e6e"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:     "c7bf84a6f727873581b3e1b5f79c1254cd5856f1241534e2f6943a8acc193e6e"
+    sha256 cellar: :any_skip_relocation, tahoe:             "b612daf4c2412d9c846570b0db0a78a41ec6e3a460c9ffd1dc9cac32dda7752a"
+    sha256 cellar: :any_skip_relocation, arm64_linux:       "9ae86aba2107b26b5cf76658117eefa9803e9e2d3800872b93e81dac8f6dbae1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:      "979baea7402fd8b6b172fcb19a12477c4ee3db46d8d910af512d380121b063e9"
+  end
+
+  on_macos do
+    depends_on macos: :monterey
   end
 
   # Don't update this unless this version cannot bootstrap the new version.
   resource "gobootstrap" do
-    on_macos do
-      if Hardware::CPU.arm?
-        url "https://storage.googleapis.com/golang/go1.16.darwin-arm64.tar.gz"
-        version "1.16"
-        sha256 "4dac57c00168d30bbd02d95131d5de9ca88e04f2c5a29a404576f30ae9b54810"
-      else
-        url "https://storage.googleapis.com/golang/go1.16.darwin-amd64.tar.gz"
-        version "1.16"
-        sha256 "6000a9522975d116bf76044967d7e69e04e982e9625330d9a539a8b45395f9a8"
+    checksums = {
+      "darwin-arm64" => "f282d882c3353485e2fc6c634606d85caf36e855167d59b996dbeae19fa7629a",
+      "darwin-amd64" => "6cc6549b06725220b342b740497ffd24e0ebdcef75781a77931ca199f46ad781",
+      "linux-arm64"  => "74d97be1cc3a474129590c67ebf748a96e72d9f3a2b6fef3ed3275de591d49b3",
+      "linux-amd64"  => "1fc94b57134d51669c72173ad5d49fd62afb0f1db9bf3f798fd98ee423f8d730",
+    }
+
+    version "1.24.13"
+
+    on_arm do
+      on_macos do
+        url "https://go.dev/dl/go#{version}.darwin-arm64.tar.gz"
+        sha256 checksums["darwin-arm64"]
+      end
+      on_linux do
+        url "https://go.dev/dl/go#{version}.linux-arm64.tar.gz"
+        sha256 checksums["linux-arm64"]
       end
     end
-
-    on_linux do
-      if Hardware::CPU.arm?
-        url "https://storage.googleapis.com/golang/go1.16.linux-arm64.tar.gz"
-        version "1.16"
-        sha256 "3770f7eb22d05e25fbee8fb53c2a4e897da043eb83c69b9a14f8d98562cd8098"
-      else
-        url "https://storage.googleapis.com/golang/go1.16.linux-amd64.tar.gz"
-        version "1.16"
-        sha256 "013a489ebb3e24ef3d915abe5b94c3286c070dfe0818d5bca8108f1d6e8440d2"
+    on_intel do
+      on_macos do
+        url "https://go.dev/dl/go#{version}.darwin-amd64.tar.gz"
+        sha256 checksums["darwin-amd64"]
+      end
+      on_linux do
+        url "https://go.dev/dl/go#{version}.linux-amd64.tar.gz"
+        sha256 checksums["linux-amd64"]
       end
     end
   end
 
+  deny_network_access!
+
   def install
+    libexec.install Dir["*"]
     (buildpath/"gobootstrap").install resource("gobootstrap")
     ENV["GOROOT_BOOTSTRAP"] = buildpath/"gobootstrap"
 
-    cd "src" do
-      ENV["GOROOT_FINAL"] = libexec
-      system "./make.bash", "--no-clean"
+    cd libexec/"src" do
+      # Set portable defaults for CC/CXX to be used by cgo
+      with_env(CC: "cc", CXX: "c++") { system "./make.bash" }
     end
 
-    (buildpath/"pkg/obj").rmtree
-    rm_rf "gobootstrap" # Bootstrap not required beyond compile.
-    libexec.install Dir["*"]
     bin.install_symlink Dir[libexec/"bin/go*"]
-
-    system bin/"go", "install", "-race", "std"
 
     # Remove useless files.
     # Breaks patchelf because folder contains weird debug/test files
-    (libexec/"src/debug/elf/testdata").rmtree
+    rm_r(libexec/"src/debug/elf/testdata")
     # Binaries built for an incompatible architecture
-    (libexec/"src/runtime/pprof/testdata").rmtree
+    rm_r(libexec/"src/runtime/pprof/testdata")
+    # Remove testdata with binaries for non-native architectures.
+    rm_r(libexec/"src/debug/dwarf/testdata")
   end
 
   test do
-    (testpath/"hello.go").write <<~EOS
+    (testpath/"hello.go").write <<~GO
       package main
 
       import "fmt"
@@ -80,14 +99,36 @@ class Go < Formula
       func main() {
           fmt.Println("Hello World")
       }
-    EOS
+    GO
+
     # Run go fmt check for no errors then run the program.
     # This is a a bare minimum of go working as it uses fmt, build, and run.
     system bin/"go", "fmt", "hello.go"
     assert_equal "Hello World\n", shell_output("#{bin}/go run hello.go")
 
-    ENV["GOOS"] = "freebsd"
-    ENV["GOARCH"] = "amd64"
-    system bin/"go", "build", "hello.go"
+    with_env(GOOS: "freebsd", GOARCH: "amd64") do
+      system bin/"go", "build", "hello.go"
+    end
+
+    (testpath/"hello_cgo.go").write <<~GO
+      package main
+
+      /*
+      #include <stdlib.h>
+      #include <stdio.h>
+      void hello() { printf("%s\\n", "Hello from cgo!"); fflush(stdout); }
+      */
+      import "C"
+
+      func main() {
+          C.hello()
+      }
+    GO
+
+    # Try running a sample using cgo without CC or CXX set to ensure that the
+    # toolchain's default choice of compilers work
+    with_env(CC: nil, CXX: nil, CGO_ENABLED: "1") do
+      assert_equal "Hello from cgo!\n", shell_output("#{bin}/go run hello_cgo.go")
+    end
   end
 end

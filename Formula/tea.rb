@@ -1,35 +1,47 @@
 class Tea < Formula
-  desc "A command line tool to interact with Gitea servers"
+  desc "Command-line tool to interact with Gitea servers"
   homepage "https://gitea.com/gitea/tea"
-  version "0.8.0"
-  @@file = "tea-#{version}-darwin-arm64"
-  url "https://dl.gitea.io/tea/#{version}/#{@@file}.xz"
+  url "https://gitea.com/gitea/tea/archive/v0.16.0.tar.gz"
+  sha256 "3c8523e551f576290c69fe6375208e0cb27d4fc1e48b29b13e02ca6ada851c05"
+  license "MIT"
+  head "https://gitea.com/gitea/tea.git", branch: "main"
 
-  os = OS.mac? ? "darwin" : "linux"
-  arch = case Hardware::CPU.arch
-        when :i386 then "386"
-        when :x86_64 then "amd64"
-        when :arm64 then "arm64"
-        else
-          raise "tea: Unsupported system architecture #{Hardware::CPU.arch}"
-        end
-  # @sha256 = %x[ curl -sL #{url}.sha256 ].split.first
-  @sha256 = case "#{os}-#{arch}"
-        when "linux-386" then "c006b38d6cbede7c3932bb762df1a06fa485e6c2af03d736bd3fa304a60376ba"   # binary
-        when "linux-amd64" then "29976cc605f0da406efdc010d4a63ff225f990ebb49efe9f54ecf5c5796e771e"
-        when "linux-arm64" then "f85754008200f4ce3a1de50f77eb72d4960fffd069d19c0655376357a70a5226" # binary
-        when "darwin-amd64" then "8d9aaef2c9e851759a575892d5af8dd2130f0b9c5705189572a282f812126a48"
-        when "darwin-arm64" then "50c14a8bee6df16483eb370dc5491e85db3a0f1a21c8d3790e0b4be0531cf6bd"
-        else
-          raise "tea: Unsupported system #{os}-#{arch}"
-        end
-  sha256 @sha256
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_golden_gate: "677a799772b1a4fbf7c2c226cdd42e7c9ab836b1cdeacdc32b266c15f44b70e5"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:       "677a799772b1a4fbf7c2c226cdd42e7c9ab836b1cdeacdc32b266c15f44b70e5"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:     "677a799772b1a4fbf7c2c226cdd42e7c9ab836b1cdeacdc32b266c15f44b70e5"
+    sha256 cellar: :any_skip_relocation, arm64_sonoma:      "677a799772b1a4fbf7c2c226cdd42e7c9ab836b1cdeacdc32b266c15f44b70e5"
+    sha256 cellar: :any_skip_relocation, tahoe:             "ad474a0ccea5939b044016dc97abe9e7dc06dc02650bd291d39a2a8f21fd167f"
+    sha256 cellar: :any_skip_relocation, arm64_linux:       "fcf3de9e67696dbcd4f9c2c4a51277e70bbc997c75d50c44faa0f507df1814fc"
+    sha256 cellar: :any,                 x86_64_linux:      "4c745d0d25e85a93f11252ec997fa4326c015813a678c4ddbb2ba81846f007d7"
+  end
+
+  depends_on "go" => :build
+
+  deny_network_access!
+
+  def fetch
+    system "go", "mod", "download"
+  end
 
   def install
-    bin.install "#{@@file}" => "tea"
+    # get gittea sdk version
+    sdk = Utils.safe_popen_read("go", "list", "-f", "{{.Version}}", "-m", "gitea.dev/sdk").to_s
+
+    ldflags = %W[
+      -X gitea.dev/tea/modules/version.Version=#{version}
+      -X gitea.dev/tea/modules/version.SDK=#{sdk}
+    ]
+
+    system "go", "build", *std_go_args(ldflags:)
+    generate_completions_from_executable(bin/"tea", "completion")
+
+    man8.mkpath
+    system bin/"tea", "man", "--out", man8/"tea.8"
   end
 
   test do
-    system "tea", "-v"
+    assert_match version.to_s, shell_output("#{bin}/tea --version")
+    assert_match "Error: no available login\n", shell_output("#{bin}/tea pulls 2>&1", 1)
   end
 end

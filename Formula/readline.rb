@@ -1,27 +1,43 @@
 class Readline < Formula
   desc "Library for command-line editing"
   homepage "https://tiswww.case.edu/php/chet/readline/rltop.html"
-  url "https://ftp.gnu.org/gnu/readline/readline-8.1.tar.gz"
-  mirror "https://ftpmirror.gnu.org/readline/readline-8.1.tar.gz"
-  version "8.1.2"
-  sha256 "f8ceb4ee131e3232226a17f51b164afc46cd0b9e6cef344be87c65962cb82b02"
+  url "https://ftpmirror.gnu.org/readline/readline-8.3.tar.gz"
+  mirror "https://ftp.gnu.org/gnu/readline/readline-8.3.tar.gz"
+  version "8.3.6"
+  sha256 "fe5383204467828cd495ee8d1d3c037a7eba1389c22bc6a041f627976f9061cc"
   license "GPL-3.0-or-later"
 
-  %w[
-    001 682a465a68633650565c43d59f0b8cdf149c13a874682d3c20cb4af6709b9144
-    002 e55be055a68cb0719b0ccb5edc9a74edcc1d1f689e8a501525b3bc5ebad325dc
-  ].each_slice(2) do |p, checksum|
+  # Add new patches using this format:
+  #
+  # patch_checksum_pairs = %w[
+  #   001 <checksum for <major>.<minor>.1>
+  #   002 <checksum for <major>.<minor>.2>
+  #   ...
+  # ]
+
+  patch_checksum_pairs = %w[
+    001 21f0a03106dbe697337cd25c70eb0edbaa2bdb6d595b45f83285cdd35bac84de
+    002 e27364396ba9f6debf7cbaaf1a669e2b2854241ae07f7eca74ca8a8ba0c97472
+    003 72dee13601ce38f6746eb15239999a7c56f8e1ff5eb1ec8153a1f213e4acdb29
+    004 1f189c4566aa35950964647b9ec3be1a821e42b86048129c63eb7f9d4d2f5a74
+    005 5481adbe161c9f6ba972c74db9e18c7aa351d3df3035cc4a673a1aa06247d1c6
+    006 4ebd261a608287796e171af0ea9af5a1e3122e46672accda2484b6698c47c1a4
+  ]
+
+  patch_checksum_pairs.each_slice(2) do |p, checksum|
     patch :p0 do
-      url "https://ftp.gnu.org/gnu/readline/readline-8.1-patches/readline81-#{p}"
-      mirror "https://ftpmirror.gnu.org/readline/readline-8.1-patches/readline81-#{p}"
+      url "https://ftpmirror.gnu.org/readline/readline-8.3-patches/readline83-#{p}"
+      mirror "https://ftp.gnu.org/gnu/readline/readline-8.3-patches/readline83-#{p}"
       sha256 checksum
+      type :cherry_pick
     end
   end
+  compatibility_version 1
 
   # We're not using `url :stable` here because we need `url` to be a string
   # when we use it in the `strategy` block.
   livecheck do
-    url "https://ftp.gnu.org/gnu/readline/"
+    url :stable
     regex(/href=.*?readline[._-]v?(\d+(?:\.\d+)+)\.t/i)
     strategy :gnu do |page, regex|
       # Match versions from files
@@ -41,7 +57,9 @@ class Readline < Formula
       next versions if patches_directory.blank?
 
       # Fetch the page for the patches directory
-      patches_page = Homebrew::Livecheck::Strategy.page_content(URI.join(@url, patches_directory[1]).to_s)
+      patches_page = Homebrew::Livecheck::Strategy.page_content(
+        "https://ftpmirror.gnu.org/readline/#{patches_directory[1]}",
+      )
       next versions if patches_page[:content].blank?
 
       # Generate additional major.minor.patch versions from the patch files in
@@ -54,35 +72,33 @@ class Readline < Formula
     end
   end
 
+  no_autobump! because: :incompatible_version_format
+
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "9d9d9512c80c6ae7c8281da84533222d90cb5e06accdfa98e0bff37672793cec"
-    sha256 cellar: :any,                 arm64_big_sur:  "08efc469d237689a9619ec6b3ea931793d03597e89bd622ebd122b7256d7a446"
-    sha256 cellar: :any,                 monterey:       "976185ec243284d74eb8b9c554d944cbc0208c26495193bcd28fdf12a08f134e"
-    sha256 cellar: :any,                 big_sur:        "1eaadc077c1584e296810abbcefd2e90bc055ddbcb675f0668e86f95f2229212"
-    sha256 cellar: :any,                 catalina:       "7346c1c37bfa5f9b9661450e8d7b627012dfc551813e3df48508a4fa1a05e6e4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2b46aff4f720e0f15601aecb2efd4ae7c2a3454b2fad91b196728ed4ee4f12c3"
+    sha256 cellar: :any, arm64_golden_gate: "74b458562c5a589a612ebba8f8fc12f3ecbe083223eb4a368c723d88b26a454d"
+    sha256 cellar: :any, arm64_tahoe:       "15cdd69af824537192843db389cbfd2459b3797cf4f36c906f8f8ab617d7d59f"
+    sha256 cellar: :any, arm64_sequoia:     "461763fa21c050a59e5bbceedf67dcacf24e4aa4604490d73f0c9fa0f40e7fe5"
+    sha256 cellar: :any, arm64_linux:       "ba75518e6b5d5376aa56fe6754deaf9188cf5df9b24f5885dbf0baf8e27a5bbe"
+    sha256 cellar: :any, x86_64_linux:      "4edcc5d53fb104818fd0e642f18edaace69e60c24b5e892df2bd437670c32857"
   end
 
   keg_only :shadowed_by_macos, "macOS provides BSD libedit"
 
   uses_from_macos "ncurses"
 
-  def install
-    args = ["--prefix=#{prefix}"]
-    args << "--with-curses" if OS.linux?
-    system "./configure", *args
+  deny_network_access!
 
-    args = []
-    args << "SHLIB_LIBS=-lcurses" if OS.linux?
-    # There is no termcap.pc in the base system, so we have to comment out
-    # the corresponding Requires.private line.
-    # Otherwise, pkg-config will consider the readline module unusable.
-    inreplace "readline.pc", /^(Requires.private: .*)$/, "# \\1"
-    system "make", "install", *args
+  def install
+    system "./configure", "--with-curses", *std_configure_args
+    # FIXME: Setting `SHLIB_LIBS` should not be needed, but, on Linux,
+    #        many dependents expect readline to link with ncurses and
+    #        are broken without it. Readline should be agnostic about
+    #        the terminfo library on Linux.
+    system "make", "install", "SHLIB_LIBS=-lcurses"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <stdlib.h>
       #include <readline/readline.h>
@@ -92,9 +108,9 @@ class Readline < Formula
         printf("%s\\n", readline("test> "));
         return 0;
       }
-    EOS
+    C
+
     system ENV.cc, "-L", lib, "test.c", "-L#{lib}", "-lreadline", "-o", "test"
-    assert_equal "test> Hello, World!\nHello, World!",
-      pipe_output("./test", "Hello, World!\n").strip
+    assert_equal "test> Hello, World!\nHello, World!", pipe_output("./test", "Hello, World!\n").strip
   end
 end

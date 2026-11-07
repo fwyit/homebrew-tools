@@ -169,6 +169,18 @@ brew会自动创建一个sweather.rb 文件，文件内容大致如下(此处我
 2. 运行`brew tap`时出现一大堆异常
   > 此处主要是由于homebrew更新导致的，可以先将代码clone到本地，然后执行`brew tap xxx 本地路径`来强制获取本地代码库，而非使用github代码库。
 
+3. 项目在进行编译的时候如果报某些头文件找不到，可以常识在cmake的时候直接指定添加`-DCMAKE_CXX_FLAGS`，如：
+  
+```
+sdk = MacOS.sdk_path
+libcxx = "#{sdk}/usr/include/c++/v1"
+args = std_cmake_args + [
+  "-DCMAKE_CXX_FLAGS=-isystem#{libcxx}",
+]
+system "cmake", "-S", ".", "-B", "build",
+  *args
+```
+
 ## 新增项目
 
 * [openresty](https://github.com/openresty/homebrew-brew)

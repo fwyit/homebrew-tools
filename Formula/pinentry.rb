@@ -1,10 +1,11 @@
 class Pinentry < Formula
   desc "Passphrase entry dialog utilizing the Assuan protocol"
   homepage "https://www.gnupg.org/related_software/pinentry/"
-  url "https://www.gnupg.org/ftp/gcrypt/pinentry/pinentry-1.2.0.tar.bz2"
-  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/pinentry/pinentry-1.2.0.tar.bz2"
-  sha256 "10072045a3e043d0581f91cd5676fcac7ffee957a16636adedaa4f583a616470"
-  license "GPL-2.0-only"
+  url "https://www.gnupg.org/ftp/gcrypt/pinentry/pinentry-1.3.3.tar.bz2"
+  mirror "https://www.mirrorservice.org/sites/ftp.gnupg.org/gcrypt/pinentry/pinentry-1.3.3.tar.bz2"
+  sha256 "c2970f16d6afb66ecddfca767d743936c86239bff936eed7fd7597a678414b63"
+  license "GPL-2.0-or-later"
+  compatibility_version 1
 
   livecheck do
     url "https://gnupg.org/ftp/gcrypt/pinentry/"
@@ -12,28 +13,33 @@ class Pinentry < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "e4d3915028ad03c6b36c388ec9241daa297832023e7dae519971a737455b6872"
-    sha256 cellar: :any,                 arm64_big_sur:  "f1aac9f10ce7c1cef39dd12298c1cf30f0534268084f19d63d3a9cf0e97f8205"
-    sha256 cellar: :any,                 monterey:       "01fe87dba48bc028e2f461d1bd8e59c67b6fdc82775bb6aa000d080fc017732e"
-    sha256 cellar: :any,                 big_sur:        "be92fdf84939d67ce31943821756e5d64b20b0b9056e31067a5fd0e96b20c2a1"
-    sha256 cellar: :any,                 catalina:       "f77593c55d085e67e32b2a164830aec2ed4023a4114cbf642772b766fe530860"
-    sha256 cellar: :any,                 mojave:         "6ca3c6242384a4e3a42cb88a2c88a932f4dbcf8b10ecdeb15afbaee0dd865f4b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e257b1ff3aada1bdb7f78fba93d6ab8f445d880395cbc330f2d2277c91ad822c"
+    sha256 cellar: :any, arm64_golden_gate: "12da28eefce12a79764f58d84b87896daf9ec44d7645d41b6434c3d4a2d58ba3"
+    sha256 cellar: :any, arm64_tahoe:       "21e2614c38af0287f96dd0c288dea2c13bfbb7810ce1d6e659ed82e5c2073c92"
+    sha256 cellar: :any, arm64_sequoia:     "eb7ffd4b8a4f31ce85cf0395656bbc1fd5241fdc1b9f92d9900e813993d4e1e0"
+    sha256 cellar: :any, arm64_sonoma:      "e4a96896da1a1a8f6ff7e95dfc39cd3f39d8200a51ef4e1e3097b93aec01088b"
+    sha256 cellar: :any, tahoe:             "a155e0fa05b40a9838334404f67e568268fbf1cb9eb64b1dacfdf75838235387"
+    sha256 cellar: :any, sonoma:            "590157c44b9ac5eadfdfac5d46897d720ff8d09ef4b64514acaa46432b8d3e1f"
+    sha256 cellar: :any, arm64_linux:       "898bda8003ce5f9e51689351dc6853c0fdde77a0d1d3cc68fd431452b558f2f8"
+    sha256 cellar: :any, x86_64_linux:      "b5e23cb72d88f6ea3c9c9f95aa356231ea072dd8f91886249154366db8ea6c69"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "pkgconf" => :build
   depends_on "libassuan"
   depends_on "libgpg-error"
 
+  uses_from_macos "ncurses"
+
   on_linux do
+    depends_on "glib"
     depends_on "libsecret"
   end
 
   def install
-    args = %W[
-      --disable-dependency-tracking
+    # Fix compile with newer Clang
+    ENV.append_to_cflags "-Wno-implicit-function-declaration" if DevelopmentTools.clang_build_version >= 1403
+
+    args = %w[
       --disable-silent-rules
-      --prefix=#{prefix}
       --disable-pinentry-fltk
       --disable-pinentry-gnome3
       --disable-pinentry-gtk2
@@ -43,12 +49,12 @@ class Pinentry < Formula
       --enable-pinentry-tty
     ]
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make", "install"
   end
 
   test do
-    system "#{bin}/pinentry", "--version"
-    system "#{bin}/pinentry-tty", "--version"
+    system bin/"pinentry", "--version"
+    system bin/"pinentry-tty", "--version"
   end
 end

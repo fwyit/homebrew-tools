@@ -1,13 +1,10 @@
 class CAres < Formula
   desc "Asynchronous DNS library"
   homepage "https://c-ares.org/"
-  url "https://c-ares.org/download/c-ares-1.18.1.tar.gz"
-  mirror "https://github.com/c-ares/c-ares/releases/download/cares-1_17_2/c-ares-1.18.1.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/dns/c-ares-1.18.1.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/dns/legacy/c-ares-1.18.1.tar.gz"
-  sha256 "1a7d52a8a84a9fbffb1be9133c0f6e17217d91ea5a6fa61f6b4729cda78ebbcf"
+  url "https://github.com/c-ares/c-ares/releases/download/v1.34.9/c-ares-1.34.9.tar.gz"
+  sha256 "9364b70a12eb59a06830fb488d9357f90100dff0d98b23ea3593a183d43e6f2f"
   license "MIT"
-  revision 1
+  compatibility_version 1
   head "https://github.com/c-ares/c-ares.git", branch: "main"
 
   livecheck do
@@ -16,24 +13,30 @@ class CAres < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "a5818fef12f8028c1ee36d9df5213a74b8e3f33b08889043908bc59364cc29b5"
-    sha256 cellar: :any,                 arm64_big_sur:  "2a3a10365f123633607a3569a8cb31afeac814229e17d975c95be5139f33fed5"
-    sha256 cellar: :any,                 monterey:       "62b9590a3b9d30d2db8696da78948fb79a26c139536c3820c4275327fd808559"
-    sha256 cellar: :any,                 big_sur:        "e276dddce0e43aba6e8f39b26be811294ae36cb7c45e203ff656bb52fa30242c"
-    sha256 cellar: :any,                 catalina:       "3d1c10f0de6c0847e972f67e7e6021fde7ccc1f58dc5497182ae7af80bb127f0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7b66f4b75a81bd37ad1eebefc4a59e4ac41eb8d2d0f2b47f56a661366193dffc"
+    sha256 cellar: :any, arm64_golden_gate: "4bbb881cf2c22728708e682a57f8c86fcd532f423be8d36a59b1500080f76820"
+    sha256 cellar: :any, arm64_tahoe:       "b14c8350a3ce4e0ee7ee87fc679bfde9e3034e47a0fe1240fd42dcb1d6a134e9"
+    sha256 cellar: :any, arm64_sequoia:     "ae8ba33a615c1738b0169d2f3f16f0d6b604bde0cd4fb05445c45c7b754d0636"
+    sha256 cellar: :any, tahoe:             "27d0566ff8df87b54361894f369981250f61e7824b23c72d23b31fa8fe3d8c04"
+    sha256 cellar: :any, arm64_linux:       "a0c6f872457cc05cb819deeba731f7d0becd268b609f21f8395320dc487cf0c9"
+    sha256 cellar: :any, x86_64_linux:      "294f16cb130751af8a596f93ff602004486b88f0417b45c2ba30be1372ba3d3a"
   end
 
   depends_on "cmake" => :build
 
   def install
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, "-DCMAKE_INSTALL_RPATH=#{rpath}"
+    args = %W[
+      -DCARES_STATIC=ON
+      -DCARES_SHARED=ON
+      -DCMAKE_INSTALL_RPATH=#{rpath}
+    ]
+
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end
 
   test do
-    (testpath/"test.c").write <<~EOS
+    (testpath/"test.c").write <<~C
       #include <stdio.h>
       #include <ares.h>
 
@@ -43,10 +46,10 @@ class CAres < Formula
         ares_library_cleanup();
         return 0;
       }
-    EOS
+    C
     system ENV.cc, "test.c", "-L#{lib}", "-lcares", "-o", "test"
     system "./test"
 
-    system "#{bin}/ahost", "127.0.0.1"
+    system bin/"ahost", "127.0.0.1"
   end
 end
