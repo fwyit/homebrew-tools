@@ -12,6 +12,7 @@ class Aom < Formula
     sha256 cellar: :any, arm64_golden_gate: "62c6e88627ca648845e877164e637feb66e64fbcc95a839f1f4a484fdfa359cd"
     sha256 cellar: :any, arm64_tahoe:       "1700f28827f8c737481b7f0b702aadd0c2c760108a3cf9fa8c227e4bfe17e518"
     sha256 cellar: :any, arm64_sequoia:     "39acbc6e2fc0c0e02623a314fc1247153288cd4c30d8945e45e4629da963f784"
+    sha256 cellar: :any, tahoe:             "4910cb37ff42f370d165c6cab977e7e2aac8673817ba5a4d2786c32471838582"
     sha256 cellar: :any, arm64_linux:       "aa0af3f40be623f4b538464c2040f5c67f065de387833cda57c4c7e91a499e5e"
     sha256 cellar: :any, x86_64_linux:      "1e3c1c9925e655d8c21273ff97ee8828d9162a837f58cf503e5bb0e77ba46e02"
   end
