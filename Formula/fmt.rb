@@ -12,6 +12,7 @@ class Fmt < Formula
     sha256 cellar: :any, arm64_tahoe:       "a218679bf77ccb0c76b316556f71a0bc5d5a1980d8cd3d2ea197a5829a140d65"
     sha256 cellar: :any, arm64_sequoia:     "301a1bbf99d3401d4e971d957eeab6c07d08fe304a690b269e04df5424fcc9d9"
     sha256 cellar: :any, arm64_sonoma:      "2e7c7c3093a62b44a4ba23a73463558b6073ee7a63e9162403701edab9403739"
+    sha256 cellar: :any, tahoe:             "5e5ea6810032f5526cb6fd8450cbe55ce743464c85ae3f54dd84e6e17ca6f28e"
     sha256 cellar: :any, sonoma:            "125d40bb96aec4f198a16252ec5358ba1c96243003e2f05d74826d867e012ddd"
     sha256 cellar: :any, arm64_linux:       "95ede71090e1b588dc9accf17d79730b8a99e82abce47bfd580fb2b7c6a32cd5"
     sha256 cellar: :any, x86_64_linux:      "9d7617cdafe71a36c5371511cdeffbe0d171c1eb93eea555a1e4028af440f5c2"
