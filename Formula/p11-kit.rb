@@ -6,12 +6,14 @@ class P11Kit < Formula
   license "BSD-3-Clause"
 
   bottle do
-    sha256 arm64_monterey: "a1c85ddc587d4b0e6ad38f7b58420ed0fc4a1ccdb038bee1451d9d81fc3fb434"
-    sha256 arm64_big_sur:  "c8610976401ff3745b737973335cd2ec7a3113737aadc9e2a1243adf404f41a3"
-    sha256 monterey:       "46805ec48a06585f71e5acaa4e099c32696a2dd7700817882211abab75fa3f1d"
-    sha256 big_sur:        "6db6726e6ba1314792648413bc991bd717380eb3ae325895750eab515ce5fa75"
-    sha256 catalina:       "dc5592e236946f8a3e57998214d13f1c0db7dab5bdd9602bb0c4a84dacf2d17a"
-    sha256 x86_64_linux:   "41dd8094535e5cb03c1c4e94290cee3047e79c07183cdccbb0f4f3cbe89d29db"
+    rebuild 1
+    sha256 arm64_monterey:  "a1c85ddc587d4b0e6ad38f7b58420ed0fc4a1ccdb038bee1451d9d81fc3fb434"
+    sha256 arm64_big_sur:   "c8610976401ff3745b737973335cd2ec7a3113737aadc9e2a1243adf404f41a3"
+    sha256 tahoe:           "dab5fa13833c7291e763b7151a1b9d60cec232017590908c66e4acdc4760a44c"
+    sha256 monterey:        "46805ec48a06585f71e5acaa4e099c32696a2dd7700817882211abab75fa3f1d"
+    sha256 big_sur:         "6db6726e6ba1314792648413bc991bd717380eb3ae325895750eab515ce5fa75"
+    sha256 x86_64_linux:    "41dd8094535e5cb03c1c4e94290cee3047e79c07183cdccbb0f4f3cbe89d29db"
+    sha256 x86_64_catalina: "dc5592e236946f8a3e57998214d13f1c0db7dab5bdd9602bb0c4a84dacf2d17a"
   end
 
   head do
