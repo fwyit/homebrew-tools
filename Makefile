@@ -90,3 +90,6 @@ ba: build-all
 qd:	# 快速下载信息
 	@n=https://github.com/fwyit/homebrew-tools/releases/download/tahoe ; export HOMEBREW_BOTTLE_DOMAIN=$$n HOMEBREW_ARTIFACT_DOMAIN=$$n; \
 	brew install fwyit/tools/$n
+
+patch: ## 快速拷贝patch信息
+	@p=$(core_rel)/../Patches/$n ; test -d $$p && cp -rf $$p Patches/ && git add Patches/$n && git status 
