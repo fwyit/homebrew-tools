@@ -17,6 +17,7 @@ class Pkgconf < Formula
     sha256 arm64_golden_gate: "b58197e979bb9d4fd7ccdb1d74ca838745473a2e48efcfb76f6cde66ff5ff81e"
     sha256 arm64_tahoe:       "eb608cba2f4fb787c34720920e2bc734114c7b90778730640edfe649bd42ea08"
     sha256 arm64_sequoia:     "813592d1417f9cd219200d674b81fce9f7b9e5cc86cbdc9022b16ce833c42aa8"
+    sha256 tahoe:             "7284150016a9f1c4fe9f26bbab684d9b01f24f0fd70f0866bd57bcb90c520cd3"
     sha256 arm64_linux:       "d49f75c4a11534c7ce11bfc75803477da3c8fce7be531c6e1f90973897cce3d9"
     sha256 x86_64_linux:      "3a89346d04ad23303ad443d0c2c75fbfac582c1ade33c55f50f8527e9fddcb5b"
   end
