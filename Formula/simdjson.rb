@@ -6,6 +6,7 @@ class Simdjson < Formula
   license "Apache-2.0"
   compatibility_version 2
   head "https://github.com/simdjson/simdjson.git", branch: "master"
+  env :std
 
   bottle do
     sha256 cellar: :any, arm64_golden_gate: "6bd70e7f557eea3b8fb88afc9f590570235c8dcda4926fac9d137e4a4afba9dc"
@@ -21,10 +22,14 @@ class Simdjson < Formula
   deny_network_access!
 
   def install
+    sdk = MacOS.sdk_path
+    libcxx = "#{sdk}/usr/include/c++/v1"
+    args = std_cmake_args
+    args << "-DCMAKE_CXX_FLAGS=-isystem#{libcxx}"
     system "cmake", "-S", ".", "-B", "build",
                     "-DBUILD_SHARED_LIBS=ON",
                     "-DSIMDJSON_BUILD_STATIC_LIB=ON",
-                    *std_cmake_args
+                    *args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end
