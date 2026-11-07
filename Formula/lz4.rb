@@ -19,6 +19,7 @@ class Lz4 < Formula
     sha256 cellar: :any, arm64_golden_gate: "53ea7532077fe43abfe3d6e0d9991ebc8370e9edcc508f997c92902d60c8b151"
     sha256 cellar: :any, arm64_tahoe:       "2be9df952396d89008e56232b065354b3bd51dde5f8a30c1fe18d765ff26e017"
     sha256 cellar: :any, arm64_sequoia:     "91674f1c7407b1f7b73d5bd1d85ed1abaaca93be3b68607af4ef3df632540ac0"
+    sha256 cellar: :any, tahoe:             "d2ddd8114d25e4e14576cc4520f050999352311e102110df92369c0118ffe0f9"
     sha256 cellar: :any, arm64_linux:       "fcb342edff20ec5c0418e4557de93ea6af1a6e0fa8b5d695223816197f60e057"
     sha256 cellar: :any, x86_64_linux:      "9e0b7281ea67651501955030ea0e1b3f4036a6a1b712589f9ac816c545577eae"
   end
