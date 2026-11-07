@@ -38,14 +38,18 @@ cp:	## 快速更新应用版本
 	@test "$$(cat ${cf})" || ( test -e ${cf}.bak && mv ${cf}.bak ${ck} && return || echo "本次未获取到 $n 内容，请核查应用的准确性" && rm -f $$n && exit 4 )
 	@git add Formula/$(n)* && git commit -m 'add 快速同步官网 ${n}' || echo "无需更新仓库内文件"
 
-build:	## 快速进行本地构建
-	@test -e Formula/$(n).rb || ( echo "请先执行make cp" && exit 2 )
-	@brew install --build-bottle fwyit/tools/$n
+new-bottle:
 	@cd bottle && fs=`ls $n-*.json 2>/dev/null`; \
 	test "$$fs" && echo "请核对是否需要再次生成bottle" && exit 0 || echo ; \
 	d=$n.done ; test ! -e $$d && brew bottle --json fwyit/tools/$n --keep-old && \
 	fs=`ls $n*.json 2>/dev/null`; \
 	brew bottle --merge --keep-old --write $$fs && date > $$d
+nb: new-bottle
+build:	## 快速进行本地构建
+	@test -e Formula/$(n).rb || ( echo "请先执行make cp" && exit 2 )
+	@brew install --build-bottle fwyit/tools/$n
+build: new-bottle
+	
 b: build
 
 check-update:	## 检查待更新的服务
