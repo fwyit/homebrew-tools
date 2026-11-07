@@ -11,6 +11,7 @@ class Llhttp < Formula
     sha256 cellar: :any, arm64_tahoe:       "0a3866a86832c768383c04809baccccfa1293a520d3d13654d7c051f12c02c80"
     sha256 cellar: :any, arm64_sequoia:     "661a11b740692ce17efa18e0d26d4c77e6e39bcdf0cc0ca53bd9a53ab4a4e71d"
     sha256 cellar: :any, arm64_sonoma:      "a00b9f89b26390cc28dd5fd70187f1830f1f1c9a9ea7df0b25faa7648137f014"
+    sha256 cellar: :any, tahoe:             "db193a8d08a1a6c5c23cc761c938a9a92122526dcb4bd3e8515bb799ec674d9c"
     sha256 cellar: :any, sonoma:            "a91b41d4c3ae2082308c3a2776d1e441289738801e14cddef2dbed6a6ea686a4"
     sha256 cellar: :any, arm64_linux:       "d2371130ab55225260beb7ef4e129cd43c8d9b6da4434c4086ec94c15fc8c7ea"
     sha256 cellar: :any, x86_64_linux:      "064d963ed771884697010f5bee50c78a8f82289cc5b0ff5793c001e5cd7acd27"
