@@ -8,7 +8,8 @@ class SpanLite < Formula
   head "https://github.com/nonstd-lite/span-lite.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "389279742b198d8b61719e3ade77c246d03e44e0b7635a77b5fc6f569162199f"
+    sha256 cellar: :any_skip_relocation, tahoe: "cb2a80e6320c03d237a7414eb4beefb249425aaa7741a15817a198ee7b78553d"
+    sha256 cellar: :any_skip_relocation, all:   "389279742b198d8b61719e3ade77c246d03e44e0b7635a77b5fc6f569162199f"
   end
 
   depends_on "cmake" => :build
