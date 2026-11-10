@@ -7,7 +7,8 @@ class TlExpected < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "c0a6195be54cf7f219a4a6f4d9f4fd5955b00f24a786f21d28a48a0d7bd3b98b"
+    sha256 cellar: :any_skip_relocation, tahoe: "e2ae1ba6b32223f6d1fbde476f6e7b91a04d5f08d698a42149a03ab8628d7398"
+    sha256 cellar: :any_skip_relocation, all:   "c0a6195be54cf7f219a4a6f4d9f4fd5955b00f24a786f21d28a48a0d7bd3b98b"
   end
 
   depends_on "cmake" => :build
