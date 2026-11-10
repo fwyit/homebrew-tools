@@ -7,7 +7,8 @@ class Doctest < Formula
   compatibility_version 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "30a480dee0a16e08b071549d936a0bb62b6e370dcd26c831d1a91071778afd0d"
+    sha256 cellar: :any_skip_relocation, tahoe: "8fb53a78e30b12cd7af39159c46ab70e00d71a08dcca186fd347fe864ab508ae"
+    sha256 cellar: :any_skip_relocation, all:   "30a480dee0a16e08b071549d936a0bb62b6e370dcd26c831d1a91071778afd0d"
   end
 
   depends_on "cmake" => :build
