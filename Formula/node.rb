@@ -34,6 +34,7 @@ class Node < Formula
   depends_on "pkgconf" => :build
   depends_on "python@3.15" => :build
   depends_on "rust" => :build
+  depends_on "ccache" => :build
   depends_on "abseil"
   depends_on "ada-url"
   depends_on "brotli"
