@@ -63,6 +63,9 @@ us:	## 快速更新core项目
 up:	## 快速将bottle的内容上传到github release
 	cd bottle && n=`ls $n*tahoe*.tar.gz` && mv $$n $${n/--/-} && gh release upload tahoe $n-*tahoe*.tar.gz
 
+upa:	## 快速同步当前没有上传的应用应用
+	for i in `ls bottle | grep tar.gz | grep '\--' | cut -d'-' -f1`; do echo "====> $$i"; $(MAKE) up n=$$i; done
+
 openresty:
 	@test "$$(git remote -v | grep openresty)" || git remote add openresty git@github.com:openresty/homebrew-brew.git
 	git fetch --depth 1 openresty
@@ -70,8 +73,10 @@ openresty:
 	grep openresty/brew  Formula/*.rb| grep depends_on | cut -d':' -f1 | sort | uniq | xargs sed -i '' 's@openresty/brew@fwyit/tools@g'
 
 prd: patch un cp build
-pa:	# 快速批量构建某个应用及其依赖
-	@for n in `brew deps --missing --include-build -n $n` $n; do echo "==== 准备更新 $$n"; $(MAKE) prd n=$$n || (echo "!!! 安装依赖 $$n 失败，任意键继续" && read); done
+
+build-all:	# 快速批量构建某个应用及其依赖
+	@caffeinate -i &; p=$$?; for n in `brew deps --missing --include-build -n $n` $n; do echo "==== 准备更新 $$n"; $(MAKE) prd n=$$n || (echo "!!! 安装依赖 $$n 失败，任意键继续" && read); done; kill $$p
+ba: build-all
 
 qd:	# 快速下载信息
 	@n=https://github.com/fwyit/homebrew-tools/releases/download/tahoe ; export HOMEBREW_BOTTLE_DOMAIN=$$n HOMEBREW_ARTIFACT_DOMAIN=$$n; \
