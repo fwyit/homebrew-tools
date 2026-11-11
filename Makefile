@@ -25,11 +25,15 @@ formula:
 
 syn: formula
 
-cp:
+patch: ## 快速拷贝patch信息
+	@p=$(core_rel)/../Patches/$n ; test -d $$p && cp -rf $$p Patches/ && git add Patches/$n && git status || echo "==> $n: 无需打对应path"
+
+cp:	## 快速更新应用版本
 	@test "$n" || ( echo "请输入需要复制的应用 n=xxx" && exit 2 )
 	#@test -e $(fn) || ( echo "未找到原始文件 $(fn)" && exit 3 )
 	@test -e $(prev) && test $$(($$(cat $(prev)) - $$(date +%s))) -gt $$((10*3600*24)) && make us || echo
 	@cp -f $(fn) Formula/ || brew cat $n > Formula/$n.rb
+	@n=Formula/$n.rb ; test "$$(cat $$n)" || ( echo "本次未获取到 $n 内容，请核查应用的准确性" && rm -f $$n && exit 4 )
 	@git add Formula/$(n)* && git commit -m 'add 快速同步官网 ${n}' || echo "无需更新仓库内文件"
 
 build:	## 快速进行本地构建
@@ -59,11 +63,21 @@ us:	## 快速更新core项目
 up:	## 快速将bottle的内容上传到github release
 	cd bottle && n=`ls $n*tahoe*.tar.gz` && mv $$n $${n/--/-} && gh release upload tahoe $n-*tahoe*.tar.gz
 
+upa:	## 快速同步当前没有上传的应用应用
+	for i in `ls bottle | grep tar.gz | grep '\--' | cut -d'-' -f1`; do echo "====> $$i"; $(MAKE) up n=$$i; done
+
 openresty:
 	@test "$$(git remote -v | grep openresty)" || git remote add openresty git@github.com:openresty/homebrew-brew.git
 	git fetch --depth 1 openresty
 	git checkout refs/remotes/openresty/master Formula
 	grep openresty/brew  Formula/*.rb| grep depends_on | cut -d':' -f1 | sort | uniq | xargs sed -i '' 's@openresty/brew@fwyit/tools@g'
 
+prd: patch un cp build
 
-prd: un cp build
+build-all:	# 快速批量构建某个应用及其依赖
+	@caffeinate -i &; p=$$?; for n in `brew deps --missing --include-build -n $n` $n; do echo "==== 准备更新 $$n"; $(MAKE) prd n=$$n || (echo "!!! 安装依赖 $$n 失败，任意键继续" && read); done; kill $$p
+ba: build-all
+
+qd:	# 快速下载信息
+	@n=https://github.com/fwyit/homebrew-tools/releases/download/tahoe ; export HOMEBREW_BOTTLE_DOMAIN=$$n HOMEBREW_ARTIFACT_DOMAIN=$$n; \
+	brew install fwyit/tools/$n
