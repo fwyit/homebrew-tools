@@ -28,14 +28,14 @@ syn: formula
 patch: ## 快速拷贝patch信息
 	@p=$(core_rel)/../Patches/$n ; test -d $$p && cp -rf $$p Patches/ && git add Patches/$n && git status || echo "==> $n: 无需打对应path"
 
-cp: cf ?= Formula/$n
+cp: cf ?= Formula/$n.rb
 cp:	## 快速更新应用版本
 	@test "$n" || ( echo "请输入需要复制的应用 n=xxx" && exit 2 )
 	@test -e "${cf}" && mv ${cf} ${cf}.bak || echo
 	#@test -e $(fn) || ( echo "未找到原始文件 $(fn)" && exit 3 )
 	@test -e $(prev) && test $$(($$(cat $(prev)) - $$(date +%s))) -gt $$((10*3600*24)) && make us || echo
-	@cp -f $(fn) Formula/ || brew cat $n > Formula/$n.rb
-	@n=Formula/$n.rb ; test "$$(cat $$n)" || ( echo "本次未获取到 $n 内容，请核查应用的准确性" && rm -f $$n && exit 4 )
+	@cp -f $(fn) Formula/ || brew cat $n > ${cf}
+	@test "$$(cat ${cf})" || ( test -e ${cf}.bak && mv ${cf}.bak ${ck} && return || echo "本次未获取到 $n 内容，请核查应用的准确性" && rm -f $$n && exit 4 )
 	@git add Formula/$(n)* && git commit -m 'add 快速同步官网 ${n}' || echo "无需更新仓库内文件"
 
 build:	## 快速进行本地构建
