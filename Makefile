@@ -28,8 +28,10 @@ syn: formula
 patch: ## 快速拷贝patch信息
 	@p=$(core_rel)/../Patches/$n ; test -d $$p && cp -rf $$p Patches/ && git add Patches/$n && git status || echo "==> $n: 无需打对应path"
 
+cp: cf ?= Formula/$n
 cp:	## 快速更新应用版本
 	@test "$n" || ( echo "请输入需要复制的应用 n=xxx" && exit 2 )
+	@test -e "${cf}" && mv ${cf} ${cf}.bak || echo
 	#@test -e $(fn) || ( echo "未找到原始文件 $(fn)" && exit 3 )
 	@test -e $(prev) && test $$(($$(cat $(prev)) - $$(date +%s))) -gt $$((10*3600*24)) && make us || echo
 	@cp -f $(fn) Formula/ || brew cat $n > Formula/$n.rb
@@ -66,16 +68,19 @@ up:	## 快速将bottle的内容上传到github release
 upa:	## 快速同步当前没有上传的应用应用
 	for i in `ls bottle | grep tar.gz | grep '\--' | cut -d'-' -f1`; do echo "====> $$i"; $(MAKE) up n=$$i; done
 
+openresty: rb ?= openresty/master
 openresty:
 	@test "$$(git remote -v | grep openresty)" || git remote add openresty git@github.com:openresty/homebrew-brew.git
 	git fetch --depth 1 openresty
-	git checkout refs/remotes/openresty/master Formula
+	git ls-tree -r --name-only ${rb} | grep Formula | tee .openresty
+	for i in `cat .openresty`; do git checkout $(rb) $$i; done
+	# git checkout refs/remotes/openresty/master Formula
 	grep openresty/brew  Formula/*.rb| grep depends_on | cut -d':' -f1 | sort | uniq | xargs sed -i '' 's@openresty/brew@fwyit/tools@g'
 
 prd: patch un cp build
 
 build-all:	# 快速批量构建某个应用及其依赖
-	@caffeinate -i &; p=$$?; for n in `brew deps --missing --include-build -n $n` $n; do echo "==== 准备更新 $$n"; $(MAKE) prd n=$$n || (echo "!!! 安装依赖 $$n 失败，任意键继续" && read); done; kill $$p
+	@caffeinate -i &  p=$$!; for n in `brew deps --missing --include-build -n $n` $n; do echo "==== 准备更新 $$n"; $(MAKE) prd n=$$n || (echo "!!! 安装依赖 $$n 失败，任意键继续" && read); done; kill $$p
 ba: build-all
 
 qd:	# 快速下载信息
