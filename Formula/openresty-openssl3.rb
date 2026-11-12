@@ -1,6 +1,10 @@
 class OpenrestyOpenssl3 < Formula
   desc "This OpenSSL 3 library build is specifically for OpenResty uses"
   homepage "https://www.openssl.org/"
+
+  bottle do
+    sha256 tahoe: "e17c8554ed96cb2acae745ade257e52d57389f2318260cc1e122085a21149c23"
+  end
   VERSION = "3.5.9".freeze
   revision 1
 
