@@ -1,11 +1,14 @@
 class Ffmpeg < Formula
-  desc "Play, record, convert, and stream audio and video"
+  desc "Play, record, convert, and stream select audio and video codecs"
   homepage "https://ffmpeg.org/"
-  url "https://ffmpeg.org/releases/ffmpeg-5.0.tar.xz"
-  sha256 "51e919f7d205062c0fd4fae6243a84850391115104ccf1efc451733bc0ac7298"
+  url "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz"
+  sha256 "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e"
   # None of these parts are used by default, you have to explicitly pass `--enable-gpl`
   # to configure to activate them. In this case, FFmpeg's license changes to GPL v2+.
-  license "GPL-2.0-or-later"
+  # Passing `--enable-version3` changes the license to GPL v3+.
+  license "GPL-3.0-or-later"
+  revision 1
+  compatibility_version 3
   head "https://github.com/FFmpeg/FFmpeg.git", branch: "master"
 
   livecheck do
@@ -14,63 +17,53 @@ class Ffmpeg < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_monterey: "ce63680952edd4c82bc73a00143ad5f87a2cc1f7c8e57078457b507d155ba94c"
-    sha256 arm64_big_sur:  "877fe3b70a34d6b2c1d3b59ee9a2107dd838cac42ffd7b1c2d9279cc55fbc4be"
-    sha256 monterey:       "06c17691891957a8fee5a6a20269aa9e221bd42aafeefcd5eeb4ff94a51f19dd"
-    sha256 big_sur:        "8ea54c02dbd8c19efc1cbfb7e105a9473c7e09d5e2564a4086a00d181f245e98"
-    sha256 catalina:       "53b165cfeeea5ae0d284c14ec13cc4a53dd6c12f4d6b00f12ab9efbbd920832c"
-    sha256 x86_64_linux:   "ea3430b0834f7b289b61fee2b0927ad26db9e4efc625b1906f69b7c156138dee"
+    sha256 arm64_golden_gate: "d521452157b1117f909f441ce90165c360a7dcd9785c87d14cabc28934572a90"
+    sha256 arm64_tahoe:       "595b0bb854e692d7f6f89b866e860afacfdab5e3698451555547f58f523ed04d"
+    sha256 arm64_sequoia:     "65ba8ccb4778a0554346f416cd9a64c6cce2f92c7af5effb48deb6b757f01678"
+    sha256 tahoe:             "c527aad52f5c689cf095bbe7e277aba2f67a7994f972ddb7efda5de859f6f453"
+    sha256 arm64_linux:       "71883b27a7bea616321bb41458d4821ee31fe3855e0f262c9b27059fa4d56d91"
+    sha256 x86_64_linux:      "9b63fb0037cb84285b5c848606e3d84af3c8c39d17030ac9796de4acf631e951"
   end
 
-  depends_on "nasm" => :build
-  depends_on "pkg-config" => :build
-  depends_on "aom"
+  depends_on "pkgconf" => :build
+
+  # Only add dependencies required for dependents in homebrew-core
+  # or INCREDIBLY widely used and light codecs in the current year (2026).
+  # Add other dependencies to ffmpeg-full formula.
+  # We should expect to remove e.g. x264 eventually (>=2027) when usage of it is
+  # negligible and has all moved to e.g. x265 instead.
   depends_on "dav1d"
-  depends_on "fontconfig"
-  depends_on "freetype"
-  depends_on "frei0r"
-  depends_on "gnutls"
   depends_on "lame"
-  depends_on "libass"
-  depends_on "libbluray"
-  depends_on "librist"
-  depends_on "libsoxr"
-  depends_on "libvidstab"
-  depends_on "libvmaf"
-  depends_on "libvorbis"
+  depends_on "libvmaf" # dependent: ab-av1
   depends_on "libvpx"
-  depends_on "opencore-amr"
-  depends_on "openjpeg"
+  depends_on "openssl@4"
   depends_on "opus"
-  depends_on "rav1e"
-  depends_on "rubberband"
-  depends_on "sdl2"
-  depends_on "snappy"
-  depends_on "speex"
-  depends_on "srt"
-  depends_on "tesseract"
-  depends_on "theora"
-  depends_on "webp"
+  depends_on "sdl2-compat"
+  depends_on "svt-av1"
   depends_on "x264"
   depends_on "x265"
-  depends_on "xvid"
   depends_on "xz"
-  depends_on "zeromq"
-  depends_on "zimg"
 
   uses_from_macos "bzip2"
   uses_from_macos "libxml2"
-  uses_from_macos "zlib"
 
   on_linux do
-    depends_on "libxv"
-    depends_on "gcc" # because rubbernand is compiled with gcc
+    depends_on "alsa-lib"
+    depends_on "libxcb"
+    depends_on "zlib-ng-compat"
   end
 
-  fails_with gcc: "5"
+  on_intel do
+    depends_on "nasm" => :build
+  end
+
+  deny_network_access!
 
   def install
+    # The new linker leads to duplicate symbol issue https://github.com/homebrew-ffmpeg/homebrew-ffmpeg/issues/140
+    ENV.append "LDFLAGS", "-Wl,-ld_classic" if DevelopmentTools.ld64_version.between?("1015.7", "1022.1")
+
+    # Fine adding any new options that don't add dependencies to the formula.
     args = %W[
       --prefix=#{prefix}
       --enable-shared
@@ -80,73 +73,41 @@ class Ffmpeg < Formula
       --host-cflags=#{ENV.cflags}
       --host-ldflags=#{ENV.ldflags}
       --enable-ffplay
-      --enable-gnutls
       --enable-gpl
-      --enable-libaom
-      --enable-libbluray
-      --enable-libdav1d
-      --enable-libmp3lame
+      --enable-libsvtav1
       --enable-libopus
-      --enable-librav1e
-      --enable-librist
-      --enable-librubberband
-      --enable-libsnappy
-      --enable-libsrt
-      --enable-libtesseract
-      --enable-libtheora
-      --enable-libvidstab
-      --enable-libvmaf
-      --enable-libvorbis
-      --enable-libvpx
-      --enable-libwebp
       --enable-libx264
+      --enable-libmp3lame
+      --enable-libdav1d
+      --enable-libvmaf
+      --enable-libvpx
       --enable-libx265
-      --enable-libxml2
-      --enable-libxvid
-      --enable-lzma
-      --enable-libfontconfig
-      --enable-libfreetype
-      --enable-frei0r
-      --enable-libass
-      --enable-libopencore-amrnb
-      --enable-libopencore-amrwb
-      --enable-libopenjpeg
-      --enable-libspeex
-      --enable-libsoxr
-      --enable-libzmq
-      --enable-libzimg
-      --disable-libjack
-      --disable-indev=jack
+      --enable-openssl
     ]
 
     # Needs corefoundation, coremedia, corevideo
-    args << "--enable-videotoolbox" if OS.mac?
+    args += %w[--enable-videotoolbox --enable-audiotoolbox] if OS.mac?
     args << "--enable-neon" if Hardware::CPU.arm?
-
-    # Replace hardcoded default VMAF model path
-    unless build.head?
-      %w[doc/filters.texi libavfilter/vf_libvmaf.c].each do |f|
-        inreplace f, "/usr/local/share/model", HOMEBREW_PREFIX/"share/libvmaf/model"
-        # Since libvmaf v2.0.0, `.pkl` model files have been deprecated in favor of `.json` model files.
-        inreplace f, "vmaf_v0.6.1.pkl", "vmaf_v0.6.1.json"
-      end
-    end
 
     system "./configure", *args
     system "make", "install"
 
     # Build and install additional FFmpeg tools
     system "make", "alltools"
-    bin.install Dir["tools/*"].select { |f| File.executable? f }
+    bin.install (buildpath/"tools").children.select { |f| f.file? && f.executable? }
+    pkgshare.install buildpath/"tools/python"
+  end
 
-    # Fix for Non-executables that were installed to bin/
-    mv bin/"python", pkgshare/"python", force: true
+  def caveats
+    <<~EOS
+      ffmpeg-full includes additional tools and libraries that are not included in the regular ffmpeg formula.
+    EOS
   end
 
   test do
-    # Create an example mp4 file
+    # Create a 5 second test MP4
     mp4out = testpath/"video.mp4"
-    system bin/"ffmpeg", "-filter_complex", "testsrc=rate=1:duration=1", mp4out
-    assert_predicate mp4out, :exist?
+    system bin/"ffmpeg", "-filter_complex", "testsrc=rate=1:duration=5", mp4out
+    assert_path_exists mp4out, "Failed to create video.mp4!"
   end
 end
