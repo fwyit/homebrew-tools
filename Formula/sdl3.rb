@@ -17,6 +17,7 @@ class Sdl3 < Formula
     sha256 cellar: :any, arm64_golden_gate: "32a702e3769562e9ef607ca5844db08eb3e491cabc9484694b112252a4ab24dd"
     sha256 cellar: :any, arm64_tahoe:       "5cc8db9dc41553bd56dcb0e6fd56591b9ac4f464ea29403c11936ec69043ac13"
     sha256 cellar: :any, arm64_sequoia:     "c1b7b92cbf6446d1f3a228accd9d158c12742b39fadc8431b3624233bcadd202"
+    sha256 cellar: :any, tahoe:             "6379f115c4f3fd280a0df4bb0c48cd52e03d779ed5d0f84a13be98a779e3019e"
     sha256 cellar: :any, arm64_linux:       "5b6cf2966f7e42e8c1a4d7639d6cf4b7a79adf501b2a798f4a49049f6865e799"
     sha256 cellar: :any, x86_64_linux:      "21efc3443f4dd34b94506c85d53d2c20bbf206f0779ac458aafa5b8551c28ee6"
   end
