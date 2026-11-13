@@ -1,10 +1,11 @@
 class Mpg123 < Formula
   desc "MP3 player for Linux and UNIX"
   homepage "https://www.mpg123.de/"
-  url "https://www.mpg123.de/download/mpg123-1.29.3.tar.bz2"
-  mirror "https://downloads.sourceforge.net/project/mpg123/mpg123/1.29.3/mpg123-1.29.3.tar.bz2"
-  sha256 "963885d8cc77262f28b77187c7d189e32195e64244de2530b798ddf32183e847"
+  url "https://www.mpg123.de/download/mpg123-1.33.7.tar.bz2"
+  mirror "https://downloads.sourceforge.net/project/mpg123/mpg123/1.33.7/mpg123-1.33.7.tar.bz2"
+  sha256 "31d0e35a4ca567ec9b5ebda6c3062bb4435d6d3eacd6ef0d95cadd7854dc03ee"
   license "LGPL-2.1-only"
+  compatibility_version 1
 
   livecheck do
     url "https://www.mpg123.de/download/"
@@ -13,19 +14,18 @@ class Mpg123 < Formula
 
   bottle do
     rebuild 1
-    sha256 arm64_monterey: "10dcbf0526607d93ffb9d8a0723a0798d2474617ad3fd395807700019621635f"
-    sha256 arm64_big_sur:  "b6c673ec40d9baff23f7ac20b710d024bd9e4eaa5a72add9a90ba0a24f90998f"
-    sha256 monterey:       "c991eb5999e7e68b403c57d855b3dfc3e4932ccc512804339b1c984297b2bf88"
-    sha256 big_sur:        "70355cefcf35844d7bf4d7b23b16e1765924d08828acc672f0eb58fbea2bb455"
-    sha256 catalina:       "c26284810d5b37211e5a0963095ec22fb07ec3862bb01ba0e87d34cf48a618c8"
-    sha256 x86_64_linux:   "56ff29e1333532bc64fba795a3d0d1384ad51fb5fc88557a4db488aad7238d75"
+    sha256 arm64_golden_gate: "56935f0083f633dda54cf02b939659c5476ba40102dd520126e8c3af762633f3"
+    sha256 arm64_tahoe:       "5fcd87caeb9b6e6730d7de5c7738e785c84814c641d1ba9ac578a142d2b033f5"
+    sha256 arm64_sequoia:     "80869bcfed43252f222be16fd652b8e691cb4a144778681853ed76e1d45a7143"
+    sha256 tahoe:             "dcbe34ed69a57e05695ea682a6a839ce2d4f09f5652337ddb4962c87357fedde"
+    sha256 arm64_linux:       "0de606c35f2bf02345bccfc76794d332ae69abe87e62bd40c8ff6ad00f774cd4"
+    sha256 x86_64_linux:      "ce54f5c88411e9986a0a5dca95579a1342e19011c8220355961c3074c823f4f4"
   end
 
+  deny_network_access!
+
   def install
-    args = %W[
-      --disable-debug
-      --disable-dependency-tracking
-      --prefix=#{prefix}
+    args = %w[
       --with-module-suffix=.so
       --enable-static
     ]
@@ -38,7 +38,7 @@ class Mpg123 < Formula
       "--with-cpu=x86-64"
     end
 
-    system "./configure", *args
+    system "./configure", *args, *std_configure_args
     system "make", "install"
   end
 
