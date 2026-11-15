@@ -41,7 +41,7 @@ cp:	## 快速更新应用版本
 build:	## 快速进行本地构建
 	@test -e Formula/$(n).rb || ( echo "请先执行make cp" && exit 2 )
 	@brew install --build-bottle fwyit/tools/$n
-	@cd bottle && fs=`ls $n*.json 2>/dev/null`; \
+	@cd bottle && fs=`ls $n-*.json 2>/dev/null`; \
 	test "$$fs" && echo "请核对是否需要再次生成bottle" && exit 0 || echo ; \
 	d=$n.done ; test ! -e $$d && brew bottle --json fwyit/tools/$n --keep-old && \
 	fs=`ls $n*.json 2>/dev/null`; \
