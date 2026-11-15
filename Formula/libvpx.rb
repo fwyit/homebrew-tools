@@ -1,45 +1,51 @@
 class Libvpx < Formula
   desc "VP8/VP9 video codec"
   homepage "https://www.webmproject.org/code/"
-  url "https://github.com/webmproject/libvpx/archive/v1.11.0.tar.gz"
-  sha256 "965e51c91ad9851e2337aebcc0f517440c637c506f3a03948062e3d5ea129a83"
+  url "https://github.com/webmproject/libvpx/archive/refs/tags/v1.17.0.tar.gz"
+  sha256 "1020f184046187baa2985dbde38e0691f49c44088bca7a1842b0236c6081dc0a"
   license "BSD-3-Clause"
+  compatibility_version 1
   head "https://chromium.googlesource.com/webm/libvpx.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "0f00a294d49ccafb88029fb76958fb2762805ca7669f64d521a0cd261df1a8ad"
-    sha256 cellar: :any,                 arm64_big_sur:  "2edfb6a133be8947da27719975dbd19dd6233e12f21d221bea7f6008cfbc51a2"
-    sha256 cellar: :any,                 monterey:       "fb3c6bc5d4acdfbe258e1c9c5e24767e170e65a434ef983fbc1525e708cc7f6c"
-    sha256 cellar: :any,                 big_sur:        "73d6365843bd6b8c868b3bf020152225d06304117c23c2a1e579ce347d3ab4e1"
-    sha256 cellar: :any,                 catalina:       "28194ea0a917dcfecbfdcd51cb37da4ae1697238e3c2dedc769c502b435124c7"
-    sha256 cellar: :any,                 mojave:         "378b9f6680ea8a99c064d8acd0cfbfbf2a1c142d8c4f27cf935dcfed3342cc61"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e79ec2f50112da2b5adfc83b46604af182af8364410c9ec686c6c519c133229d"
+    rebuild 1
+    sha256 cellar: :any, arm64_golden_gate: "f9a11c2c10694acd896b66b09697b159cb82f5552837603cbb90366049562572"
+    sha256 cellar: :any, arm64_tahoe:       "f98fa074f8eef7b2de3346fb83d4da15e7e6284fd13bf65210d855043f78f8c1"
+    sha256 cellar: :any, arm64_sequoia:     "dd7924c0a05fa5f840f17ab9f5fac72d8672d75b2a7d44dbbf811274f70d17d6"
+    sha256 cellar: :any, tahoe:             "e3aa9ecd8ebbfccc38b0a212eefee1686cba0ce56c6ddec9448cb474f73fc9dc"
+    sha256 cellar: :any, arm64_linux:       "82c10ba5a9b83d8afc77b2a9e7025ccfb9d75aee7332b85e489b374240347754"
+    sha256 cellar: :any, x86_64_linux:      "85e403fcad2c6060c590a53b5cd17d8685ce155fd57385a4d17e70809e62e282"
   end
 
-  depends_on "yasm" => :build
+  on_intel do
+    depends_on "nasm" => :build
+  end
+
+  # Add Golden Gate support. Remove patch when supported in a released version.
+  patch :DATA
+
+  deny_network_access!
 
   def install
+    ENV.runtime_cpu_detection
+    # NOTE: `libvpx` will fail to build on new macOS versions before the
+    # `configure` and `build/make/configure.sh` files are updated to support
+    # the new target (e.g., `arm64-darwin24-gcc` for macOS 15). We [temporarily]
+    # patch these files to add the new target (until there is a new version).
+    # If we don't want to create a patch each year, we can consider using
+    # `--force-target=#{Hardware::CPU.arch}-darwin#{OS.kernel_version.major}-gcc`
+    # to force the target instead.
     args = %W[
       --prefix=#{prefix}
       --disable-dependency-tracking
       --disable-examples
       --disable-unit-tests
       --enable-pic
+      --enable-runtime-cpu-detect
       --enable-shared
       --enable-vp9-highbitdepth
     ]
-
-    # `configure` misdetects Monterey as `generic-gnu`.
-    # Reported via email to https://groups.google.com/a/webmproject.org/group/codec-devel
-    args << "--target=#{Hardware::CPU.arch}-darwin20-gcc" if OS.mac? && MacOS.version >= :monterey
-
-    if Hardware::CPU.intel?
-      ENV.runtime_cpu_detection
-      args << "--enable-runtime-cpu-detect"
-    end
-
-    # https://bugs.chromium.org/p/webm/issues/detail?id=1475
-    args << "--disable-avx512" if MacOS.version <= :el_capitan
+    args << "--target=#{Hardware::CPU.arch}-darwin#{OS.kernel_version.major}-gcc" if OS.mac?
 
     mkdir "macbuild" do
       system "../configure", *args
@@ -51,3 +57,47 @@ class Libvpx < Formula
     system "ar", "-x", "#{lib}/libvpx.a"
   end
 end
+
+__END__
+diff --git a/build/make/configure.sh b/build/make/configure.sh
+index b37b998..e44b41a 100644
+--- a/build/make/configure.sh
++++ b/build/make/configure.sh
+@@ -832,7 +832,7 @@ process_common_toolchain() {
+         tgt_isa=x86_64
+         tgt_os=`echo $gcctarget | sed 's/.*\(darwin1[0-9]\).*/\1/'`
+         ;;
+-      *darwin2[0-5]*)
++      *darwin2[0-7]*)
+         tgt_isa=`uname -m`
+         tgt_os=`echo $gcctarget | sed 's/.*\(darwin2[0-9]\).*/\1/'`
+         ;;
+@@ -991,7 +991,7 @@ EOF
+       add_cflags  "-mmacosx-version-min=10.15"
+       add_ldflags "-mmacosx-version-min=10.15"
+       ;;
+-    *-darwin2[0-5]-*)
++    *-darwin2[0-7]-*)
+       add_cflags  "-arch ${toolchain%%-*}"
+       add_ldflags "-arch ${toolchain%%-*}"
+       ;;
+diff --git a/configure b/configure
+index 9e9d80b..6722e99 100755
+--- a/configure
++++ b/configure
+@@ -105,6 +105,7 @@ all_platforms="${all_platforms} arm64-darwin22-gcc"
+ all_platforms="${all_platforms} arm64-darwin23-gcc"
+ all_platforms="${all_platforms} arm64-darwin24-gcc"
+ all_platforms="${all_platforms} arm64-darwin25-gcc"
++all_platforms="${all_platforms} arm64-darwin27-gcc"
+ all_platforms="${all_platforms} arm64-linux-gcc"
+ all_platforms="${all_platforms} arm64-win64-gcc"
+ all_platforms="${all_platforms} arm64-win64-vs15"
+@@ -174,6 +175,7 @@ all_platforms="${all_platforms} x86_64-darwin22-gcc"
+ all_platforms="${all_platforms} x86_64-darwin23-gcc"
+ all_platforms="${all_platforms} x86_64-darwin24-gcc"
+ all_platforms="${all_platforms} x86_64-darwin25-gcc"
++all_platforms="${all_platforms} x86_64-darwin27-gcc"
+ all_platforms="${all_platforms} x86_64-iphonesimulator-gcc"
+ all_platforms="${all_platforms} x86_64-linux-gcc"
+ all_platforms="${all_platforms} x86_64-linux-icc"

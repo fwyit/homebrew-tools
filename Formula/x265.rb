@@ -1,55 +1,72 @@
 class X265 < Formula
   desc "H.265/HEVC encoder"
-  homepage "https://bitbucket.org/multicoreware/x265_git"
-  url "https://bitbucket.org/multicoreware/x265_git/get/3.5.tar.gz"
-  sha256 "5ca3403c08de4716719575ec56c686b1eb55b078c0fe50a064dcf1ac20af1618"
-  license "GPL-2.0-only"
-  head "https://bitbucket.org/multicoreware/x265_git.git", branch: "master"
+  homepage "https://github.com/Multicorewareinc/x265"
+  url "https://github.com/Multicorewareinc/x265/releases/download/4.3/x265_4.3.tar.gz"
+  sha256 "83c53e4c8bbb8f1e33ed59e10a7d621d1d7801ca853910c3eb41f038b8ffb121"
+  license "GPL-2.0-or-later"
+  compatibility_version 2
+  head "https://github.com/Multicorewareinc/x265.git", branch: "master"
 
   bottle do
     rebuild 1
-    sha256 cellar: :any,                 arm64_monterey: "e60559191a9aba607e512ad33ac9f66688b12837df7e6a3cf57ceae26968235b"
-    sha256 cellar: :any,                 arm64_big_sur:  "adc617eed2e065af669994fb5b538195fd46db4ac7b13c7ca2490dc8abaf6466"
-    sha256 cellar: :any,                 monterey:       "be446f5c7cb4872205f260b8821fc7ebd5bd7c4b8837888c98c08e051dff2e3f"
-    sha256 cellar: :any,                 big_sur:        "55bb46a5dc1924e59b7fa7bc800a21c0cf21355e48cb38b941d8e786427c70a0"
-    sha256 cellar: :any,                 catalina:       "5e5bc106e1cf971a176dd5b37a61d28769e353f81102c011b4230cc8732eca7a"
-    sha256 cellar: :any,                 mojave:         "c61ebdf9dcd4aedf5da2a7eb2b3a5154fd355c105a19a0471d43a3aa67f3cb88"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c80f18988caea25e95ca87dd648f5ff8b0856e24d26adc8d68ca68cc6d4faabf"
+    sha256 cellar: :any, arm64_golden_gate: "df60f322e2ea139e4f3075fcf93e09d02249f183084d1ffa2d8f0cc9427de882"
+    sha256 cellar: :any, arm64_tahoe:       "46dd2b3656ec8e99438a789b627e41a25e3a24407dc76a3a6b88cf159b447858"
+    sha256 cellar: :any, arm64_sequoia:     "18e89a5822e2f4f91f919c5bf2fbac31433a561c48174fc15e13b4911a1232ac"
+    sha256 cellar: :any, tahoe:             "d0f602ecb239a38695b39839c316093e5a663d857b6d0fec71b3fbf82274059d"
+    sha256 cellar: :any, arm64_linux:       "f30cc9469b596d98729aec68017e7a671d5cc5244e72314583bc6a08eec4a7a6"
+    sha256 cellar: :any, x86_64_linux:      "d9ce6c22591a7e62792420fafc0d717daa6e15ecf90d5ee58d8c8440f3408c31"
   end
 
   depends_on "cmake" => :build
-  depends_on "nasm" => :build if Hardware::CPU.intel?
+
+  on_intel do
+    depends_on "nasm" => :build
+  end
+
+  resource "homebrew-test_video", :test do
+    url "https://raw.githubusercontent.com/fraunhoferhhi/vvenc/master/test/data/RTn23_80x44p15_f15.yuv"
+    sha256 "ecd2ef466dd2975f4facc889e0ca128a6bea6645df61493a96d8e7763b6f3ae9"
+  end
+
+  # downloads a test file
+  allow_network_access! :test
 
   def install
+    ENV.runtime_cpu_detection
     # Build based off the script at ./build/linux/multilib.sh
-    args = std_cmake_args + %W[
+    args = %W[
       -DLINKED_10BIT=ON
       -DLINKED_12BIT=ON
       -DEXTRA_LINK_FLAGS=-L.
       -DEXTRA_LIB=x265_main10.a;x265_main12.a
       -DCMAKE_INSTALL_RPATH=#{rpath}
     ]
-    high_bit_depth_args = std_cmake_args + %w[
+    args << "-DENABLE_SVE2=OFF" if OS.linux? && Hardware::CPU.arm?
+    high_bit_depth_args = %w[
       -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF
       -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
     ]
+    high_bit_depth_args << "-DENABLE_SVE2=OFF" if OS.linux? && Hardware::CPU.arm?
+
     (buildpath/"8bit").mkpath
+    system "cmake", "-S", buildpath/"source", "-B", "10bit",
+                    "-DENABLE_HDR10_PLUS=ON",
+                    *high_bit_depth_args,
+                    *std_cmake_args
+    system "cmake", "--build", "10bit"
+    mv "10bit/libx265.a", buildpath/"8bit/libx265_main10.a"
 
-    mkdir "10bit" do
-      system "cmake", buildpath/"source", "-DENABLE_HDR10_PLUS=ON", *high_bit_depth_args
-      system "make"
-      mv "libx265.a", buildpath/"8bit/libx265_main10.a"
-    end
+    system "cmake", "-S", buildpath/"source", "-B", "12bit",
+                    "-DMAIN12=ON",
+                    *high_bit_depth_args,
+                    *std_cmake_args
+    system "cmake", "--build", "12bit"
+    mv "12bit/libx265.a", buildpath/"8bit/libx265_main12.a"
 
-    mkdir "12bit" do
-      system "cmake", buildpath/"source", "-DMAIN12=ON", *high_bit_depth_args
-      system "make"
-      mv "libx265.a", buildpath/"8bit/libx265_main12.a"
-    end
+    system "cmake", "-S", buildpath/"source", "-B", "8bit", *args, *std_cmake_args
+    system "cmake", "--build", "8bit"
 
     cd "8bit" do
-      system "cmake", buildpath/"source", *args
-      system "make"
       mv "libx265.a", "libx265_main.a"
 
       if OS.mac?
@@ -66,11 +83,13 @@ class X265 < Formula
   end
 
   test do
-    yuv_path = testpath/"raw.yuv"
+    resource("homebrew-test_video").stage testpath
+    yuv_path = testpath/"RTn23_80x44p15_f15.yuv"
     x265_path = testpath/"x265.265"
-    yuv_path.binwrite "\xCO\xFF\xEE" * 3200
-    system bin/"x265", "--input-res", "80x80", "--fps", "1", yuv_path, x265_path
+    system bin/"x265", "--input-res", "360x640", "--fps", "60", "--input", yuv_path, "-o", x265_path
     header = "AAAAAUABDAH//w=="
     assert_equal header.unpack("m"), [x265_path.read(10)]
+
+    assert_match "version #{version}", shell_output("#{bin}/x265 -V 2>&1")
   end
 end
