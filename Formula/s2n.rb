@@ -16,7 +16,7 @@ class S2n < Formula
     sha256 cellar: :any, arm64_golden_gate: "a9692e41728dee66261036ac4f6554457180e9133bdae95d00cf5efebb9a817c"
     sha256 cellar: :any, arm64_tahoe:       "920f4a4af9da7fd54ead1a3d79532c21774551fea650367031075591c71ed83c"
     sha256 cellar: :any, arm64_sequoia:     "cbe081756ea280698ecef18bec710c89c6ea710b28475d2d252e88d1dfd92545"
-    sha256 cellar: :any, tahoe:             "625ba3e5c4a9786ec1ba4d9da4c77fc734cae2e6caa96ea6fb85437efba01e8e"
+    sha256 cellar: :any, tahoe:             "0f5ba6c72df09ae450190ace530d76ada6c970a8d3204df43ee109d1d5eae2f1"
     sha256 cellar: :any, arm64_linux:       "dde8c9471b6559edc3cd6ffa37c0e845989585aefa3c487415e58704918dd2f4"
     sha256 cellar: :any, x86_64_linux:      "8c68a5067229931896e5ef9101a45e3160b0d32920d2cf1a38dc269969062810"
   end
