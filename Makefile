@@ -67,10 +67,10 @@ us:	## 快速更新core项目
 	cd `brew --repo homebrew/core` && git pull origin main
 	date +%s > ${prev}
 up:	## 快速将bottle的内容上传到github release
-	cd bottle && n=`ls $n*tahoe*.tar.gz` && mv $$n $${n/--/-} && gh release upload tahoe $n-*tahoe*.tar.gz
+	cd bottle && n=`ls $n--*tahoe*.tar.gz` && mv $$n $${n/--/-} && gh release upload tahoe $n-*tahoe*.tar.gz
 
 upa:	## 快速同步当前没有上传的应用应用
-	for i in `ls bottle | grep tar.gz | grep '\--' | cut -d'-' -f1`; do echo "====> $$i"; $(MAKE) up n=$$i; done
+	for i in `ls bottle | grep $n-- | grep tar.gz | grep '\--' | cut -d'-' -f1`; do echo "====> $$i"; $(MAKE) up n=$$i; done
 
 openresty: rb ?= openresty/master
 openresty:
