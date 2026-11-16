@@ -45,11 +45,10 @@ new-bottle:
 	fs=`ls $n*.json 2>/dev/null`; \
 	brew bottle --merge --keep-old --write $$fs && date > $$d
 nb: new-bottle
-build:	## 快速进行本地构建
+build-only:
 	@test -e Formula/$(n).rb || ( echo "请先执行make cp" && exit 2 )
 	@brew install --build-bottle fwyit/tools/$n
-build: new-bottle
-	
+build:	build-only new-bottle ## 快速进行本地构建
 b: build
 
 check-update:	## 检查待更新的服务
@@ -70,7 +69,7 @@ up:	## 快速将bottle的内容上传到github release
 	cd bottle && n=`ls $n--*tahoe*.tar.gz` && mv $$n $${n/--/-} && gh release upload tahoe $n-*tahoe*.tar.gz
 
 upa:	## 快速同步当前没有上传的应用应用
-	for i in `ls bottle | grep $n-- | grep tar.gz | grep '\--' | cut -d'-' -f1`; do echo "====> $$i"; $(MAKE) up n=$$i; done
+	for i in `ls bottle | grep tar.gz | grep '\--' | awk -F'--' '{print $$1}'`; do echo "====> $$i"; $(MAKE) up n=$$i; done
 
 openresty: rb ?= openresty/master
 openresty:
